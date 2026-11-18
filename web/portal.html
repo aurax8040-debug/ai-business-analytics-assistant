@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面目录 · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/portal.css">
+<link rel="stylesheet" href="/agent-dock.css">
+</head>
+<body>
+<div class="portal-page">
+
+  <!-- ===================================================== 品牌栏 -->
+  <header class="portal-head">
+    <div class="portal-brand">
+      <span class="portal-mark">MI</span>
+      <div>
+        <h1>Marketing Intelligence Platform</h1>
+        <p>页面目录 · 快消 KA 经营分析 · 六个一级模块 / 七个页面</p>
+      </div>
+    </div>
+    <div class="portal-head-right">
+      <span class="chip chip-year">Y26 · 2026 年 1–10 月</span>
+      <span class="chip plain">数据截止 2026-10-31</span>
+    </div>
+  </header>
+
+  <!-- ===================================================== 统一口径 + 快速导航 -->
+  <div class="portal-subbar">
+    <span><b>范围</b> 五大战区：战区A / 战区B / 战区C / 战区D / 战区E（不含战区F、战区G）</span>
+    <span><b>数据源</b> ETL V1 SQLite（mode=ro）</span>
+    <span><b>核算</b> ERP Sell-in 与 POS Sell-out 独立，金额不相加</span>
+    <nav class="portal-quick" aria-label="页面导航">
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link" href="/pos.html">POS 分析</a>
+      <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+      <a class="nav-link" href="/sc.html">供应链看板</a>
+    </nav>
+  </div>
+
+  <!-- ===================================================== 一级模块 01–05（已上线） -->
+  <div class="portal-section-title"><h2>一级模块 · 已上线</h2>
+    <span>共 6 个一级模块（7 个业务页面：SFA 含两页）· 全部已验收 · 含本页目录共 8 个可访问页面</span></div>
+  <div class="portal-grid">
+
+    <a class="portal-card" href="/" id="card-dashboard">
+      <div class="portal-thumb" aria-hidden="true">
+        <span class="thumb-caption">版式示意</span>
+        <div class="thumb-kpis"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-table"><i></i><i></i><i></i></div>
+      </div>
+      <div class="portal-card-body">
+        <div class="portal-card-head">
+          <h3><em class="module-no">01</em>AI 经营驾驶舱</h3><span class="tag-ok">V2 已验收</span><span class="tag-ok">V1.1 已验收</span>
+        </div>
+        <p><b>单页经营总览</b>：销售达成 / 预测 / 战区地图 / KA / 利润 / 异常 / 按需 AI 洞察，
+          并已并入原「全国经营驾驶舱」独有的执行、结构与明细区块（旧地址自动跳转）。</p>
+        <ul>
+          <li><b>6 张 KPI</b>：TE 预算达成率 / 实际出货 TE / 销售预测 TE / ERP 出货金额 / 毛利额 / 毛利率</li>
+          <li><b>五大战区气泡地图 + 预算达成对比 + 趋势 / KA / 利润 / 异常</b>，点战区即筛选联动</li>
+          <li><b>已并入</b>：SFA 拜访执行 · 批发库存与出库 · SKU 动销 TOP10 · 品类与粒数结构 · 经营明细（POS / ERP）</li>
+          <li><b>AI 洞察按需生成</b>，事实 / 推测 / 建议分层，数据不足直接说明；四模块金额永不相加</li>
+        </ul>
+        <div class="portal-card-foot"><span class="portal-url" data-path="/">/</span><span class="portal-cta">打开首页 →</span></div>
+      </div>
+    </a>
+
+    <a class="portal-card" href="/analysis.html" id="card-analysis">
+      <div class="portal-thumb thumb-5" aria-hidden="true">
+        <span class="thumb-caption">版式示意</span>
+        <div class="thumb-kpis"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-table"><i></i><i></i><i></i></div>
+      </div>
+      <div class="portal-card-body">
+        <div class="portal-card-head">
+          <h3><em class="module-no">02</em>战区销售达成跟进</h3><span class="tag-ok">V1 已验收</span>
+        </div>
+        <p>战区 → 市场部 → 客户类型三级交叉表：同期预算、当期销量与达成率一屏对齐。</p>
+        <ul>
+          <li><b>三级树形</b>：战区 / 市场部 / 客户类型可逐层展开，带小计与全国合计</li>
+          <li><b>右侧达成率条</b>：同口径横条，绿 ≥95% / 黄 80–95% / 红 &lt;80%</li>
+          <li><b>客户下钻</b>：集团 → 客户 → ERP 出货行（月 × SKU）+ 月度柱图</li>
+        </ul>
+        <div class="portal-card-foot"><span class="portal-url" data-path="/analysis.html">/analysis.html</span><span class="portal-cta">打开页面 →</span></div>
+      </div>
+    </a>
+
+    <a class="portal-card" href="/pos.html" id="card-pos">
+      <div class="portal-thumb thumb-5" aria-hidden="true">
+        <span class="thumb-caption">版式示意</span>
+        <div class="thumb-kpis"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-table"><i></i><i></i><i></i></div>
+      </div>
+      <div class="portal-card-body">
+        <div class="portal-card-head">
+          <h3><em class="module-no">03</em>POS 门店动销分析</h3><span class="tag-ok">V1 已验收</span>
+        </div>
+        <p>门店级 Sell-out 动销视角，回答「这 27 家对齐门店卖得怎么样、谁在涨、谁在跌」。</p>
+        <ul>
+          <li><b>六指标 + 六区块</b>：月度趋势（含环比）· 门店排名 · KA 结构 · 品类与 SKU · 动销动能 · 集中度与覆盖边界</li>
+          <li><b>动销动能</b>：窗口前后半段月均对比，直接列出增长最快与下滑最多的门店（16 涨 / 11 跌）</li>
+          <li><b>覆盖边界写清</b>：421 家门店中仅 27 家有 POS 数据，394 家仅 SFA、不按零销售计；POS 金额与 ERP 永不相加</li>
+        </ul>
+        <div class="portal-card-foot"><span class="portal-url" data-path="/pos.html">/pos.html</span><span class="portal-cta">打开页面 →</span></div>
+      </div>
+    </a>
+
+    <a class="portal-card" href="/sfa-visit.html" id="card-sfa">
+      <div class="portal-thumb thumb-5" aria-hidden="true">
+        <span class="thumb-caption">版式示意</span>
+        <div class="thumb-kpis"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-table"><i></i><i></i><i></i></div>
+      </div>
+      <div class="portal-card-body">
+        <div class="portal-card-head">
+          <h3><em class="module-no">04</em>SFA 销售执行分析</h3><span class="tag-ok">V1 已验收</span>
+        </div>
+        <p>拜访执行与终端画像两个看板，回答「团队有没有按标准做到、门店长什么样」。</p>
+        <ul>
+          <li><b>看板 A 销售拜访分析</b>：月度目标配置（未配置不参与完成率）· 战区完成 · 人员排名 · 覆盖与重复 · 客户经理下钻</li>
+          <li><b>看板 B 门店画像分析</b>：基本画像 · 现场反馈 SKU 结构（≠ POS 销量排名）· 门店前端零售价 · 陈列采集覆盖率</li>
+          <li><b>SFA × POS 联合分析</b>：只在 27 家可关联门店内评估，未匹配保留 PENDING，POS 无记录 ≠ 零销售</li>
+        </ul>
+        <div class="portal-card-foot"><span class="portal-url">/sfa-visit.html · /sfa-profile.html</span><span class="portal-cta">打开页面 →</span></div>
+      </div>
+    </a>
+
+    <a class="portal-card" href="/wholesale.html" id="card-wholesale">
+      <div class="portal-thumb thumb-5" aria-hidden="true">
+        <span class="thumb-caption">版式示意</span>
+        <div class="thumb-kpis"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-table"><i></i><i></i><i></i></div>
+      </div>
+      <div class="portal-card-body">
+        <div class="portal-card-head">
+          <h3><em class="module-no">05</em>批发进销存分析</h3><span class="tag-ok">V1 已验收</span>
+        </div>
+        <p>批发渠道进销存与库存风险视角，回答「货压在哪个档口、什么 SKU 上」。</p>
+        <ul>
+          <li><b>三类金额独立核算</b>：批发采购 ¥1.55 亿 / 批发出库 ¥1.03 亿 / 期末库存 ¥1.50 亿，<b>永不相加</b></li>
+          <li><b>P07 库存口径</b>：ending_qty 是时点值，月末取该月最后一个自然日的真实记录，不补零、不前向填充</li>
+          <li><b>2,946 有效组合 / 1,014 N/A</b>，REAL_ZERO 与 NOT_YET_ACTIVE 严格分列，单据数按单据号去重</li>
+        </ul>
+        <div class="portal-card-foot"><span class="portal-url" data-path="/wholesale.html">/wholesale.html</span><span class="portal-cta">打开页面 →</span></div>
+      </div>
+    </a>
+
+    <a class="portal-card" href="/sc.html" id="card-sc">
+      <div class="portal-thumb thumb-5" aria-hidden="true">
+        <span class="thumb-caption">版式示意</span>
+        <div class="thumb-kpis"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-row"><i></i><i></i><i></i><i></i></div>
+        <div class="thumb-table"><i></i><i></i><i></i></div>
+      </div>
+      <div class="portal-card-body">
+        <div class="portal-card-head">
+          <h3><em class="module-no">06</em>供应链看板</h3><span class="tag-ok">V1 已验收</span>
+        </div>
+        <p>果萃到货与包材采购视角，回答「货还能做多少盒、卡在哪个物料上」。</p>
+        <ul>
+          <li><b>业务口径</b>：星禾代理果萃，果子到港直接入库（无采购，只看数量）；采购仅在包材（8 种配件 + 最近 PO 单价估算金额）</li>
+          <li><b>6 张 KPI</b>：成品 609,681 盒 / 原料 1,040 万粒（30 批）/ 包材 1,858 万件 / 金额 ¥253 万（估算）/ 可支撑 20 天 / 到货准班率 91%</li>
+          <li><b>72 SKU 可支撑能力</b>：全量列表 + 多选 2–4 个并排对比，瓶颈项高亮——72/72 瓶颈均为果子</li>
+          <li><b>BOM 规格用量</b>：2 粒装无内托；数据层为独立 MOCK 库（supply_chain_v1.db，mode=ro），与 ETL 库物理隔离、跨库只读联查</li>
+        </ul>
+        <div class="portal-card-foot"><span class="portal-url" data-path="/sc.html">/sc.html</span><span class="portal-cta">打开页面 →</span></div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ===================================================== AI 分析层（建设中） -->
+  <a class="portal-ai" href="/opportunity.html">
+    <span class="ai-mark">AI</span>
+    <span class="ai-txt">
+      <h3>AI 分析层 · 机会引擎 <span class="ai-chip">机会一已上线 · V0</span></h3>
+      <p>高增长 SKU 渗透：识别高增长 SKU → 匹配无销售门店 → <b>联合 SFA 判三态（无 POS ≠ 未上架）</b> → 分位数测算增量 → 铺货建议（待验证）。规划中：价格 / 门店覆盖 / 结构 / 客户渠道四类机会，共用同一引擎。</p>
+    </span>
+    <span class="ai-cta">打开机会引擎 →</span>
+  </a>
+
+  <!-- ===================================================== 边界与文档 -->
+  <div class="portal-grid-2">
+    <section class="portal-note">
+      <h3>统一口径与边界</h3>
+      <ul>
+        <li>全局固定 <b>Y26</b>（2026-01-01 ~ 2026-10-31 自然月），仅展示 Y26，不做跨年对比。</li>
+        <li>战区范围固定五大战区；战区F、战区G为 <code>OUT_OF_SCOPE</code>，未知为 <code>UNKNOWN</code>。</li>
+        <li>所有数值来自已验收 ETL 视图的参数化聚合；前端不重算指标、不使用静态假数据。</li>
+        <li>不修改源 CSV、不修改 ETL V1；不跨事实表直接 JOIN，不将 ERP、POS、批发金额相加。</li>
+        <li>维度可用性：KA 系统仅 POS、客户仅 ERP，不猜测 KA↔客户映射。</li>
+        <li>POS 只覆盖 <b>27 家对齐门店</b>（五大战区 421 家中），其余 394 家仅 SFA、无 POS 数据源，<b>不按零销售计</b>。</li>
+        <li>供应链看板（06）数据来自独立模拟库 <code>supply_chain_v1.db</code>（固定种子、mode=ro），与 ETL 库物理隔离，仅跨库只读联查，不写回任何库。</li>
+      </ul>
+    </section>
+    <section class="portal-note">
+      <h3>服务与验收文档</h3>
+      <ul>
+        <li>启动：<code>python3 run.py</code>，浏览器访问 <code>/portal.html</code> 进入本目录。</li>
+        <li>驾驶舱验收：<code>reports/ui_v1_1_acceptance_report.md</code>、<code>reports/dashboard_screenshot.png</code>。</li>
+        <li>综合经营分析验收：<code>reports/analysis_v1_acceptance_report.md</code>、<code>reports/analysis_*.png</code>。</li>
+        <li>三个新看板验收：<code>reports/sfa_visit_acceptance_report.md</code>、<code>reports/sfa_profile_acceptance_report.md</code>、<code>reports/wholesale_acceptance_report.md</code>（截图在 <code>reports/v3/</code>）。</li>
+        <li>POS 动销验收：<code>reports/pos_acceptance_report.md</code>、口径 <code>reports/pos_caliber.md</code>（截图在 <code>reports/v4/</code>）。</li>
+        <li>供应链看板验收：<code>tests/test_25_sc_board.py</code>（27 条黄金值断言）、设计口径 <code>docs/supply_chain_p5_design.md</code>。</li>
+        <li>AI 经营助手（LangGraph）：页面 <a href="/agent.html"><code>/agent.html</code></a>，接口 <code>/api/agent/chat</code>、<code>/api/agent/stream</code>，工具清单 <code>/api/agent/tools</code>。</li>
+        <li>字段与指标口径：<code>reports/sfa_visit_caliber.md</code>、<code>reports/sfa_profile_caliber.md</code>、<code>reports/wholesale_caliber.md</code>、<code>reports/pos_caliber.md</code>。</li>
+        <li>浏览器测试：<code>tests/browser_e2e.mjs</code>、<code>tests/analysis_e2e.mjs</code>、<code>tests/portal_e2e.mjs</code>、<code>tests/sfa_visit_e2e.mjs</code>、<code>tests/sfa_profile_e2e.mjs</code>、<code>tests/wholesale_e2e.mjs</code>、<code>tests/pos_e2e.mjs</code>。</li>
+        <li>后端测试：<code>python3 -m unittest discover -s tests -p "test_*.py"</code>。</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="portal-foot">Marketing Intelligence Platform · BI 前端 V1 · 数据基础层 ETL V1（只读）</div>
+
+</div>
+<script>
+/* 卡片底部地址按当前访问域名显示：本机显示 127.0.0.1:8765/pos.html，
+   分享域名显示 xxx.app.workbuddy.host/pos.html，避免把本机地址当成对外链接。 */
+(function () {
+  var host = location.host;
+  if (!host) return;                       // file:// 直接打开时保留相对路径
+  var items = document.querySelectorAll('.portal-url[data-path]');
+  Array.prototype.forEach.call(items, function (el) {
+    var path = el.getAttribute('data-path');
+    el.textContent = host + path;
+    el.title = location.protocol + '//' + host + path;
+  });
+})();
+</script>
+<script src="/page-context.js"></script>
+<script src="/agent-dock.js"></script>
+</body>
+</html>

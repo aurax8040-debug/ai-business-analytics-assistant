@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POS 门店动销 · Y26 2026 · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/board.css">
+<link rel="stylesheet" href="/pos.css">
+<link rel="stylesheet" href="/agent-dock.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================================================== 顶部筛选区 -->
+  <header class="topbar board-topbar">
+    <div class="title-block">
+      <span class="title-bar"></span>
+      <h1>星禾食品 BI 数据中心</h1>
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link is-current" href="/pos.html">POS 分析</a>
+      <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+      <a class="nav-link" href="/sc.html">供应链看板</a>
+    </div>
+    <div class="filters board-filters">
+      <div class="fitem"><label>月份</label><select id="f-month"></select></div>
+      <div class="fitem"><label>战区</label><select id="f-region"></select></div>
+      <div class="fitem"><label>KA 系统</label><select id="f-ka"></select></div>
+      <div class="fitem"><label>品类</label><select id="f-category"></select></div>
+      <div class="fitem"><label>SKU</label><select id="f-sku"></select></div>
+      <div class="fitem"><label>门店</label><select id="f-store"></select></div>
+      <button class="btn btn-reset" id="btn-reset">重置</button>
+    </div>
+  </header>
+
+  <div class="subbar">
+    <span class="chip chip-year" id="chip-period">Y26 · 2026 年 1–10 月</span>
+    <span class="chip plain" id="chip-coverage">POS 覆盖 —</span>
+    <span class="chip plain" id="chip-fresh">数据刷新 —</span>
+    <span id="active-chips" class="chips"></span>
+    <span class="subbar-right">
+      <span class="status" id="status-badge">就绪</span>
+      <button class="btn btn-sm btn-primary" id="btn-refresh">刷新</button>
+    </span>
+  </div>
+
+  <div class="alert alert-error hidden" id="alert"></div>
+
+  <div class="notice notice-info" id="notice-main">
+    <div class="notice-body" id="notice-main-text">正在读取 POS 终端销售数据…</div>
+  </div>
+
+  <!-- ===================================================== KPI -->
+  <div class="row-label">
+    <b>终端动销核心指标</b>
+    <span id="kpi-sub">POS 终端销售 = 门店收银端成交，与 ERP 出货不是同一口径，金额永不相加</span>
+  </div>
+  <section class="kpi-row six" id="kpi-row" aria-label="终端动销核心指标"></section>
+
+  <!-- ===================================================== A 趋势 -->
+  <div class="row-label"><b>A 终端销售月度趋势</b><span>自然月口径 · 环比只在相邻自然月之间算，不做同比</span></div>
+  <section class="board-grid one">
+    <div class="card tall">
+      <div class="card-head">
+        <h3>月度销售额与销量</h3>
+        <div class="pill-tabs" id="trend-metric">
+          <button data-metric="amount" class="on">金额</button><button data-metric="boxes">盒数</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-trend"></div>
+      <div class="mini-legend" id="legend-trend"></div>
+      <div class="card-foot" id="foot-trend"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== B/C 门店与 KA -->
+  <div class="row-label"><b>B 门店动销排名 · C KA 系统结构</b><span>排名按销售额 · 角标为占大盘比重</span></div>
+  <section class="board-grid two">
+    <div class="card tall">
+      <div class="card-head"><h3>门店动销排名</h3>
+        <div class="pill-tabs" id="store-metric">
+          <button data-metric="amount" class="on">金额</button><button data-metric="boxes">盒数</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-store"></div>
+      <div class="card-foot" id="foot-store"></div>
+    </div>
+
+    <div class="card tall">
+      <div class="card-head"><h3>KA 系统销售额结构</h3><span class="card-tag">按 KA 系统</span></div>
+      <div class="chart-host" id="chart-ka"></div>
+      <div class="card-foot" id="foot-ka"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== D 品类与 SKU -->
+  <div class="row-label"><b>D 品类结构与 SKU 动销</b><span>结构指标只描述"卖了什么"，不代表价格执行</span></div>
+  <section class="board-grid two">
+    <div class="card tall">
+      <div class="card-head"><h3>品类金额结构</h3><span class="card-tag">品类A / 品类B / 品类C</span></div>
+      <div class="chart-host" id="chart-category"></div>
+      <div class="card-foot" id="foot-category"></div>
+    </div>
+
+    <div class="card tall">
+      <div class="card-head"><h3>SKU 动销排名 Top 10</h3>
+        <div class="pill-tabs" id="sku-metric">
+          <button data-metric="amount" class="on">金额</button><button data-metric="boxes">盒数</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-sku"></div>
+      <div class="card-foot" id="foot-sku"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== E 动能 -->
+  <div class="row-label"><b>E 门店动销动能</b>
+    <span id="momentum-sub">窗口前后半段月均对比 · 不是同比</span></div>
+  <section class="board-grid one">
+    <div class="card">
+      <div class="card-head"><h3>增长最快与下滑最多的门店</h3>
+        <span class="card-tag" id="momentum-split">—</span></div>
+      <div class="momentum-grid">
+        <div class="momentum-col">
+          <div class="momentum-head"><b>后半段更强</b><span>按动能降序</span>
+            <span class="tag" id="momentum-up-count">—</span></div>
+          <div id="momentum-up"></div>
+        </div>
+        <div class="momentum-col">
+          <div class="momentum-head"><b>后半段走弱</b><span>按动能升序</span>
+            <span class="tag" id="momentum-down-count">—</span></div>
+          <div id="momentum-down"></div>
+        </div>
+      </div>
+      <div class="card-foot" id="foot-momentum"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== F 集中度与覆盖 -->
+  <div class="row-label"><b>F 集中度与覆盖边界</b><span>这个大盘由几家店撑着 · 哪些门店根本没有 POS 数据</span></div>
+  <section class="board-grid two">
+    <div class="card">
+      <div class="card-head"><h3>销售额集中度</h3><span class="card-tag">CR3 / CR5 / CR10</span></div>
+      <div class="coverage-wrap">
+        <div class="chart-host" id="chart-concentration" style="flex:0 0 172px;min-height:0"></div>
+        <div class="fact-list" id="fact-concentration"></div>
+      </div>
+      <div class="card-foot" id="foot-concentration"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>POS 覆盖边界</h3><span class="card-tag">有数据 vs 无数据</span></div>
+      <div class="coverage-wrap">
+        <div class="chart-host" id="chart-coverage" style="flex:0 0 172px;min-height:0"></div>
+        <div class="fact-list coverage-facts" id="fact-coverage"></div>
+      </div>
+      <div class="coverage-note" id="foot-coverage"></div>
+    </div>
+  </section>
+
+  <details class="capability-box" id="capability-box">
+    <summary><b>口径与边界声明</b><span id="capability-count"></span>
+      <span class="cap-hint">展开查看（不混算、不补零、不推断价格执行）</span></summary>
+    <div class="capability-body" id="capability-list"></div>
+  </details>
+
+  <!-- ===================================================== 明细 -->
+  <div class="row-label"><b>动销明细</b><span id="detail-sub">门店 × 月看节奏 · 门店 × SKU 看结构</span></div>
+  <section class="card detail-card">
+    <div class="board-detail-head">
+      <div class="detail-search">
+        <input type="search" id="detail-q" placeholder="搜索门店 / 编码 / SKU…" maxlength="40" autocomplete="off">
+      </div>
+      <span class="detail-hint" id="detail-sort-hint">点击表头可排序 · 点击门店行可下钻</span>
+      <span class="grow"></span>
+      <span class="seg-label" id="detail-grain"></span>
+      <div class="pill-tabs" id="detail-kind">
+        <button data-kind="store" class="on">门店 × 月</button>
+        <button data-kind="sku">门店 × SKU</button>
+      </div>
+    </div>
+    <div class="tbl-wrap detail-tbl" id="detail-table"></div>
+    <div class="detail-foot">
+      <span id="detail-count"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-sm" id="detail-prev">上一页</button>
+      <span id="detail-page" class="page-label"></span>
+      <button class="btn btn-sm" id="detail-next">下一页</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a></span>
+    <span><b>数据源</b> POS 终端销售（对齐版，ETL V1 只读）</span>
+    <span><b>口径</b> P01 五大战区 / P05 自然年 Y26 / P12 仅对齐版 / P13 不进 SFA_ONLY</span>
+    <span><b>边界</b> POS 无记录 ≠ 零销售；单价为 SKU 级固定标价，不做价格执行分析</span>
+    <span><b>刷新</b> <span id="foot-etl">—</span></span>
+  </footer>
+</div>
+
+<!-- ===================================================== 门店下钻抽屉 -->
+<div class="modal-mask hidden" id="drill-mask">
+  <div class="drawer">
+    <div class="drawer-head">
+      <h3 id="drill-title">门店动销下钻</h3><span class="sub" id="drill-sub"></span>
+      <button class="btn btn-sm" style="margin-left:auto" id="drill-close">关闭</button>
+    </div>
+    <div class="drawer-body">
+      <div class="kpi-row three" id="drill-kpi" style="margin-bottom:10px"></div>
+      <div class="drill-meta" id="drill-meta"></div>
+      <div class="row-label"><b>月度节奏</b><span>该店在所选窗口内的销售额与环比</span></div>
+      <div class="chart-host" id="drill-trend" style="min-height:0"></div>
+      <div class="drawer-split" style="margin-top:10px">
+        <div>
+          <div class="row-label"><b>品类结构</b></div>
+          <div id="drill-cat"></div>
+        </div>
+        <div>
+          <div class="row-label"><b>Top SKU</b><span>该店销售额前 8</span></div>
+          <div class="tbl-wrap drawer-mini" id="drill-sku"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="/pos.js"></script>
+<script src="/page-context.js"></script>
+<script src="/agent-dock.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>批发经营分析 · Y26 2026 · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/board.css">
+<link rel="stylesheet" href="/agent-dock.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================================================== 顶部筛选区 -->
+  <header class="topbar board-topbar">
+    <div class="title-block">
+      <span class="title-bar"></span>
+      <h1>星禾食品 BI 数据中心</h1>
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link" href="/pos.html">POS 分析</a>
+      <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link is-current" href="/wholesale.html">批发经营分析</a>
+      <a class="nav-link" href="/sc.html">供应链看板</a>
+    </div>
+    <div class="filters board-filters">
+      <div class="fitem"><label>月份</label><select id="f-month"></select></div>
+      <div class="fitem"><label>战区</label><select id="f-region"></select></div>
+      <div class="fitem"><label>批发客户</label><select id="f-customer"></select></div>
+      <div class="fitem"><label>档口</label><select id="f-stall"></select></div>
+      <div class="fitem"><label>SKU</label><select id="f-sku"></select></div>
+      <button class="btn btn-reset" id="btn-reset">重置</button>
+    </div>
+  </header>
+
+  <div class="subbar">
+    <span class="chip chip-year" id="chip-period">Y26 · 2026 年 1–10 月</span>
+    <span class="chip plain" id="chip-anchor">库存时点 —</span>
+    <span class="chip plain">三类金额独立核算，不相加</span>
+    <span id="active-chips" class="chips"></span>
+    <span class="subbar-right">
+      <span class="status" id="status-badge">就绪</span>
+      <button class="btn btn-sm btn-primary" id="btn-refresh">刷新</button>
+    </span>
+  </div>
+
+  <div class="alert alert-error hidden" id="alert"></div>
+
+  <div class="notice notice-info" id="notice-main">
+    <div class="notice-body" id="notice-main-text">正在读取批发进销存数据…</div>
+  </div>
+
+  <!-- ===================================================== KPI -->
+  <div class="row-label">
+    <b>批发核心指标</b>
+    <span id="kpi-sub">采购 = ERP 向批发客户出货 · 出库 = 批发客户对下游销售 · 库存为时点值（P07）</span>
+  </div>
+  <section class="kpi-row six" id="kpi-row" aria-label="批发核心指标"></section>
+
+  <!-- ===================================================== A 经营趋势 -->
+  <div class="row-label"><b>A 批发经营趋势</b><span>采购与出库按月并列，金额 / 数量切换</span></div>
+  <section class="board-grid one">
+    <div class="card tall">
+      <div class="card-head">
+        <h3>采购 / 出库月度趋势</h3>
+        <div class="pill-tabs" id="trend-metric">
+          <button data-metric="amount" class="on">金额</button><button data-metric="qty">数量</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-trend"></div>
+      <div class="mini-legend" id="legend-trend"></div>
+      <div class="card-foot" id="foot-trend"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== B/C 客户与档口 -->
+  <div class="row-label"><b>B 客户经营 · C 档口经营</b><span>采购 / 出库口径切换 · 库存规模为时点值</span></div>
+  <section class="board-grid two">
+    <div class="card tall">
+      <div class="card-head"><h3>批发客户经营排名</h3>
+        <div class="pill-tabs" id="cust-mode">
+          <button data-mode="purchase" class="on">采购</button><button data-mode="sales">出库</button>
+        </div></div>
+      <div class="chart-host" id="chart-customer"></div>
+      <div class="card-foot" id="foot-customer"></div>
+    </div>
+
+    <div class="card tall">
+      <div class="card-head"><h3>档口经营排名</h3>
+        <div class="pill-tabs" id="stall-mode">
+          <button data-mode="purchase" class="on">采购</button><button data-mode="sales">出库</button>
+          <button data-mode="stock">库存</button>
+        </div></div>
+      <div class="chart-host" id="chart-stall"></div>
+      <div class="card-foot" id="foot-stall"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== D/E SKU 与库存 -->
+  <div class="row-label"><b>D SKU 经营 · E 库存分析</b><span>库存为时点快照，跨日期不累加</span></div>
+  <section class="board-grid two">
+    <div class="card tall">
+      <div class="card-head"><h3>SKU 经营排名</h3>
+        <div class="pill-tabs" id="sku-mode">
+          <button data-mode="sales" class="on">出库</button><button data-mode="purchase">采购</button>
+          <button data-mode="stock">库存</button>
+        </div></div>
+      <div class="chart-host" id="chart-sku"></div>
+      <div class="card-foot" id="foot-sku"></div>
+    </div>
+
+    <div class="card tall">
+      <div class="card-head"><h3>库存变化趋势</h3><span class="card-tag">时点 · 全组合合计</span></div>
+      <div class="chart-host" id="chart-inventory"></div>
+      <div class="card-foot" id="foot-inventory"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== F 月末与归零 -->
+  <div class="row-label"><b>F 月末库存与归零结构</b>
+    <span>月末取该月最后一个自然日真实记录 · NOT_YET_ACTIVE 与 REAL_ZERO 分列</span></div>
+  <section class="board-grid two">
+    <div class="card">
+      <div class="card-head"><h3>月末库存</h3><span class="card-tag">月末最后一天</span></div>
+      <div class="tbl-wrap" id="month-end-table" style="max-height:292px"></div>
+      <div class="card-foot" id="foot-monthend"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>库存归零结构</h3><span class="card-tag">按档口×SKU 组合</span></div>
+      <div class="fact-list" id="fact-zero"></div>
+      <div class="tbl-wrap" id="stock-table" style="max-height:200px;margin-top:8px"></div>
+      <div class="card-foot" id="foot-zero"></div>
+    </div>
+  </section>
+
+  <details class="capability-box" id="capability-box">
+    <summary><b>P07 库存口径与金额边界</b><span id="capability-count"></span>
+      <span class="cap-hint">展开查看（不补零、不前向填充、不跨系统相加）</span></summary>
+    <div class="capability-body" id="capability-list"></div>
+  </details>
+
+  <!-- ===================================================== 明细 -->
+  <div class="row-label"><b>经营明细</b><span id="detail-sub">采购 / 出库 / 库存三类明细，单据数按单据号去重统计</span></div>
+  <section class="card detail-card">
+    <div class="board-detail-head">
+      <div class="detail-search">
+        <input type="search" id="detail-q" placeholder="搜索单据号 / 客户 / 档口 / SKU…" maxlength="40" autocomplete="off">
+      </div>
+      <span class="detail-hint" id="detail-sort-hint">点击表头可排序</span>
+      <span class="grow"></span>
+      <span class="seg-label" id="detail-doc"></span>
+      <div class="pill-tabs" id="detail-kind">
+        <button data-kind="purchase" class="on">采购明细</button>
+        <button data-kind="sales">出库明细</button>
+        <button data-kind="inventory">库存明细</button>
+      </div>
+    </div>
+    <div class="tbl-wrap detail-tbl" id="detail-table"></div>
+    <div class="detail-foot">
+      <span id="detail-count"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-sm" id="detail-prev">上一页</button>
+      <span id="detail-page" class="page-label"></span>
+      <button class="btn btn-sm" id="detail-next">下一页</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a></span>
+    <span><b>数据源</b> 批发采购 / 出库 / 日库存 V2（ETL V1 只读）</span>
+    <span><b>口径</b> P01 五大战区 / P05 自然年 Y26 / P07 库存时点</span>
+    <span><b>边界</b> 批发采购 = ERP 出货同源单据，与全渠道 ERP 不叠加</span>
+    <span><b>仓储</b> 2,946 有效组合 · 1,014 N/A 组合已排除、不填零</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="/wholesale.js"></script>
+<script src="/page-context.js"></script>
+<script src="/agent-dock.js"></script>
+</body>
+</html>

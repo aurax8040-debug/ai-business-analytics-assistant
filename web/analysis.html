@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>战区销售达成跟进 · 战区 / 市场部 / 客户类型 · 2026</title>
+<link rel="stylesheet" href="/analysis-grid.css">
+<!-- PORTAL_NAV_BEGIN -->
+<link rel="stylesheet" href="/nav.css">
+<!-- PORTAL_NAV_END -->
+<link rel="stylesheet" href="/agent-dock.css">
+</head>
+<body class="bi-body">
+
+<!-- ============================================================ 蓝色顶导航 -->
+<header class="bi-top">
+  <div class="bi-top-in">
+    <span class="bi-brand"><i>佳</i>星禾食品 BI 数据中心</span>
+    <!-- PORTAL_NAV_BEGIN -->
+    <nav class="bi-nav">
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link is-current" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link" href="/pos.html">POS 分析</a>
+      <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+      <a class="nav-link" href="/sc.html">供应链看板</a>
+    </nav>
+    <!-- PORTAL_NAV_END -->
+    <span class="bi-top-right" id="bi-updated">—</span>
+  </div>
+</header>
+
+<!-- ============================================================ 筛选区 -->
+<section class="bi-filter" id="bi-filter">
+  <label class="bi-field"><span>年份</span><select id="f-year"></select></label>
+  <label class="bi-field"><span>月份</span><select id="f-month"></select></label>
+  <label class="bi-field"><span>战区</span><select id="f-region"></select></label>
+  <label class="bi-field"><span>市场部</span><select id="f-dept"></select></label>
+  <label class="bi-field"><span>品类</span><select id="f-category"></select></label>
+  <label class="bi-field"><span>产地</span><select id="f-origin"
+      title="产地按 SKU 标注；筛产地时预算按该范围内实际 TE 占比分摊（估算口径）"></select></label>
+  <label class="bi-field"><span>客户类型</span><select id="f-segment"></select></label>
+  <label class="bi-field"><span>查找</span><input id="f-q" type="search" placeholder="战区 / 市场部 / 类型"></label>
+
+  <div class="bi-actions">
+    <button class="bi-btn primary" id="btn-query" type="button">查询</button>
+    <button class="bi-btn" id="btn-reset" type="button">重置</button>
+    <button class="bi-btn" id="btn-save" type="button">保存常用参数</button>
+    <button class="bi-btn" id="btn-export" type="button">导出 CSV</button>
+  </div>
+</section>
+
+<!-- ============================================================ 左表 + 右达成率 -->
+<main class="bi-main">
+  <section class="bi-panel">
+    <div class="bi-panel-head">
+      <h2>经营数据交叉分析</h2>
+      <span class="bi-sub" id="grid-sub">战区 → 市场部 → 客户类型</span>
+      <div class="bi-right">
+        <button class="bi-btn" id="btn-expand" type="button">全部展开</button>
+        <button class="bi-btn" id="btn-collapse" type="button">全部收起</button>
+      </div>
+    </div>
+    <div class="bi-tablewrap" id="tablewrap">
+      <table class="bi-grid" id="grid">
+        <thead>
+          <tr>
+            <th class="no-sort" style="width:88px">战区</th>
+            <th data-sort="name" style="min-width:150px">市场部 / 客户类型<span class="bi-arrow">↕</span></th>
+            <th data-sort="last_te" style="width:104px">同期销量(TE)<span class="bi-arrow">↕</span></th>
+            <th data-sort="budget" style="width:104px">当期预算(TE)<span class="bi-arrow">↕</span></th>
+            <th data-sort="te" style="width:104px">当期销量(TE)<span class="bi-arrow">↕</span></th>
+            <th data-sort="attainment" style="width:92px">当期完成率<span class="bi-arrow">↕</span></th>
+            <th data-sort="yoy" style="width:88px">同比分析<span class="bi-arrow">↕</span></th>
+            <th class="no-sort" style="width:96px">预算差额(TE)</th>
+          </tr>
+        </thead>
+        <tbody id="grid-body">
+          <tr><td colspan="8" class="bi-empty">加载中…</td></tr>
+        </tbody>
+        <tfoot id="grid-foot"></tfoot>
+      </table>
+    </div>
+    <div class="bi-pager">
+      <span id="pager-info">—</span>
+      <span class="bi-right" id="pager-btns"></span>
+    </div>
+  </section>
+
+  <aside class="bi-panel">
+    <div class="bi-panel-head">
+      <h2>目标达成率</h2>
+      <span class="bi-sub" id="att-sub">与左侧表格同一口径 · 点击定位</span>
+      <div class="bi-right">
+        <select id="att-level" class="bi-btn" style="height:24px">
+          <option value="dept">按 战区 / 市场部</option>
+          <option value="segment">按 客户类型</option>
+        </select>
+      </div>
+    </div>
+    <div class="bi-attwrap" id="attwrap">
+      <p class="bi-empty">加载中…</p>
+    </div>
+    <div class="bi-legend">
+      <span><i style="background:#24965c"></i>≥ 95%</span>
+      <span><i style="background:#dda21c"></i>80% – 95%</span>
+      <span><i style="background:#d14641"></i>&lt; 80%</span>
+      <span style="margin-left:auto">竖线 = 100% 基准</span>
+    </div>
+  </aside>
+</main>
+
+<!-- ============================================================ 页脚口径 -->
+<footer class="bi-foot">
+  <span><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a></span>
+  <span><b>口径</b> 实际 = ERP 出货 TE；达成率 = 实际 ÷ 同期预算 TE；同比 = 本期 ÷ 去年同期 − 1</span>
+  <span><b>预算来源</b> <span id="foot-budget">MOCK_BUDGET_TE（模拟预算，非真实下达目标）</span></span>
+  <span><b>月份</b> <span id="foot-months">—</span></span>
+  <span><b>数据范围</b> <span id="foot-ext">—</span></span>
+  <span><b>边界</b> 金额永不相加 · 无业务/无预算期间显示「—」不用 0 伪装 · 批发按档口归属不重复计算</span>
+</footer>
+
+<!-- ============================================================ 下钻 -->
+<div class="bi-drill hidden" id="drill">
+  <div class="bi-drill-card">
+    <header class="bi-drill-head">
+      <div>
+        <h3 id="drill-title">客户明细</h3>
+        <p id="drill-scope">—</p>
+      </div>
+      <button id="drill-close" type="button">关闭</button>
+    </header>
+    <div class="bi-drill-body" id="drill-body"></div>
+  </div>
+</div>
+
+<div class="bi-toast" id="toast"></div>
+<script type="module" src="/analysis-grid.js"></script>
+<script src="/page-context.js"></script>
+<script src="/agent-dock.js"></script>
+</body>
+</html>

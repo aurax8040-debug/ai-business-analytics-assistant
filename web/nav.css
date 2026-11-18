@@ -1,0 +1,21 @@
+/* =====================================================================
+   Marketing Intelligence Platform · 全站共享页面导航
+   胶囊式一级入口；选中态 = 品牌蓝实心。
+   只定义导航本身，不覆盖 styles.css 的任何组件规则。
+   ===================================================================== */
+.nav-link {
+  display: inline-flex; align-items: center; height: 30px;
+  font-size: 12px; font-weight: 650; color: var(--ink-2);
+  text-decoration: none; white-space: nowrap; padding: 0 12px;
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  background: transparent; transition: .15s ease;
+}
+.nav-link:hover { background: var(--brand-soft); color: var(--brand); }
+.nav-link.is-current {
+  color: #fff; background: var(--brand); border-color: var(--brand);
+  box-shadow: 0 2px 8px rgba(26, 111, 240, .28);
+}
+.nav-link.is-current:hover { color: #fff; filter: brightness(.93); }
+
+/* 品牌栏里的导航组：与标题之间留出呼吸感 */
+.title-block .nav-link:first-of-type { margin-left: 6px; }

@@ -1,0 +1,134 @@
+/* =====================================================================
+   全站 AI 经营助手抽屉（agent-dock.js）+ 右下角入口
+   V2：从「驾驶舱私有浮层」升级为「全站共享抽屉」
+     · 右下角悬浮按钮（所有 BI 页面）
+     · 右侧滑出，可展开 460 → 760，不跳页、不改页面布局
+     · 只新增 .ck-dock* / .ck-agent-fab 类，不改各页面既有规则
+   ===================================================================== */
+
+/* ------------------------------------------------------------ 入口按钮 */
+.ck-agent-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 55;
+  width: 50px;
+  height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #1a63e6, #3b86f7);
+  box-shadow: 0 10px 26px rgba(26, 99, 230, .38), 0 2px 5px rgba(12, 34, 71, .16);
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.ck-agent-fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 14px 32px rgba(26, 99, 230, .46); }
+.ck-agent-fab:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.ck-agent-fab.is-open { transform: scale(.94); }
+
+/* ------------------------------------------------------------ 抽屉 */
+.ck-dock {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 60;
+  width: 460px;
+  height: min(710px, calc(100vh - 120px));
+  display: flex;
+  flex-direction: column;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ee);
+  border-radius: 14px;
+  box-shadow: 0 26px 64px rgba(12, 34, 71, .26), 0 2px 6px rgba(12, 34, 71, .08);
+  overflow: hidden;
+  animation: ck-dock-in .18s ease-out;
+}
+.ck-dock.hidden { display: none; }
+.ck-dock.is-wide { width: min(780px, 92vw); }
+
+@keyframes ck-dock-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.ck-dock-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px 9px 14px;
+  border-bottom: 1px solid var(--border, #dbe3ee);
+  background: linear-gradient(180deg, #f7fbff, #fff);
+}
+.ck-dock-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--ink, #12233d);
+  white-space: nowrap;
+}
+.ck-dock-brand i {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: linear-gradient(135deg, #1a63e6, #3b86f7);
+}
+.ck-dock-scope {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1c5fc9;
+  background: #eef4fd;
+  border: 1px solid #cfe0fb;
+  border-radius: 20px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+.ck-dock-acts { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
+.ck-dock-btn {
+  height: 24px; min-width: 24px; padding: 0 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid transparent; border-radius: 7px;
+  background: transparent; color: var(--ink-2, #4a5a72);
+  font-size: 11.5px; font-weight: 600; cursor: pointer;
+}
+.ck-dock-btn:hover { background: #eef4fd; border-color: #d8e5f7; color: #1a63e6; }
+.ck-dock-btn.is-sync { color: #8a5a00; background: #fff6e6; border-color: #f4e0b8; }
+.ck-dock-x { font-size: 15px; line-height: 1; }
+
+.ck-dock-body { flex: 1 1 auto; min-height: 0; background: var(--surface, #fff); }
+.ck-dock-body iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+.ck-dock-foot {
+  flex: 0 0 auto;
+  padding: 5px 14px 7px;
+  border-top: 1px solid var(--border, #dbe3ee);
+  background: #fafcff;
+  font-size: 10.5px;
+  color: var(--muted, #7b8ca1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ck-dock-foot b { color: var(--ink-2, #4a5a72); font-weight: 650; }
+.ck-dock-note { margin-left: auto; white-space: nowrap; }
+
+/* 小屏：抽屉占满可视区，避免半屏挤成三条字 */
+@media (max-width: 760px) {
+  .ck-dock {
+    right: 0; bottom: 0; width: 100%;
+    height: 100vh; border-radius: 0; border: 0;
+  }
+  .ck-dock.is-wide { width: 100%; }
+  .ck-agent-fab { right: 14px; bottom: 14px; width: 46px; height: 46px; }
+}
+
+/* 说明：曾尝试「打开时给页面加右内边距让位」，实测在 1440 宽下把
+   KPI 与客户贡献表压到不可读（cockpit 的 3 列栅格需要 ≥1360 才不挤），
+   所以改为浮层覆盖 + 降低高度，让顶部 KPI 与右上图表仍然露出。
+   真正的「逐行核对」由对话内的「数据核对」区承担。 */

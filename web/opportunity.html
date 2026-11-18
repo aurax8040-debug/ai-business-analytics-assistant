@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机会引擎 · 高增长 SKU 渗透 · 星禾食品 BI 数据中心</title>
+<link rel="stylesheet" href="/nav.css">
+<style>
+:root{
+  --bg:#eaf0f8; --surface:#fff; --surface-2:#f6f9fd; --surface-3:#eef4fc;
+  --border:#e4ebf6; --border-strong:#d3dfef;
+  --ink:#16233a; --ink-2:#41546f; --muted:#8697ae;
+  --brand:#1a6ff0; --brand-2:#4f92f7; --brand-3:#9cc2fb; --brand-soft:#eaf2ff;
+  --up:#e5484d; --down:#10a06a; --warn:#eda33c;
+  --radius:10px; --radius-sm:6px; --shadow:0 1px 2px rgba(20,45,85,.04),0 6px 18px rgba(20,45,85,.05);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:13px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;padding:18px 22px 30px}
+.wrap{max-width:1180px;margin:0 auto}
+a{color:var(--brand);text-decoration:none}
+
+.topnav{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-bottom:12px}
+
+.pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.pagehead h1{font-size:19px;font-weight:700;line-height:1.35}
+.pagehead h1 .h1-sub{font-size:14px;font-weight:600;color:var(--ink-2);margin-left:8px}
+.pagehead .sub{color:var(--muted);font-size:11.5px;margin-top:2px}
+.chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-top:3px}
+.chip{background:var(--brand-soft);color:var(--brand);border-radius:6px;padding:2px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.chip.ai{background:#f3ecff;color:#6a3fd0}
+.chip.ro{background:var(--surface-3);color:var(--ink-2);border:1px solid var(--border)}
+.chip.draft{background:#fff4e3;color:#b26a00}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px}
+.card > h2{font-size:13.5px;font-weight:700;padding:11px 14px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card > h2 .h2-sub{font-size:11px;font-weight:600;color:var(--muted)}
+.card .body{padding:12px 14px}
+
+.layout{display:grid;grid-template-columns:430px 1fr;gap:14px;align-items:start}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}}
+
+/* ── 左：SKU 列表 ─────────────────────────────── */
+.listbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
+.listbar b{color:var(--ink-2)}
+.sorts{display:flex;gap:4px;margin-left:auto}
+.sorts button{border:1px solid var(--border);background:var(--surface-2);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--ink-2);cursor:pointer;font-weight:600;white-space:nowrap}
+.sorts button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+table{border-collapse:collapse;width:100%;table-layout:fixed}
+th,td{padding:6px 8px;border-bottom:1px solid var(--border);font-size:11.5px;text-align:left;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th{background:var(--surface-2);color:var(--muted);font-weight:600;position:sticky;top:0}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.gaprow{cursor:pointer}
+tr.gaprow:hover{background:var(--brand-soft)}
+tr.gaprow.pick{background:var(--brand-soft);box-shadow:inset 3px 0 0 var(--brand)}
+.yoy{color:var(--up);font-weight:700}
+.skucode{font-family:ui-monospace,Menlo,monospace;font-weight:700;color:var(--ink-2)}
+.listwrap{max-height:560px;overflow:auto}
+
+/* ── 右：机会卡片 ─────────────────────────────── */
+.chead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--border)}
+.chead h3{font-size:16px;font-weight:700}
+.chead .code{font-family:ui-monospace,Menlo,monospace;color:var(--muted);font-size:12px}
+.badge{border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge.grow{background:#fdecec;color:var(--up)}
+.badge.sus{background:#fff4e3;color:#b26a00}
+.badge.ver{background:var(--brand-soft);color:var(--brand)}
+.badge.none{background:var(--surface-3);color:var(--muted)}
+.sec{padding:12px 14px;border-bottom:1px solid var(--border)}
+.sec:last-child{border-bottom:none}
+.sec h4{font-size:12px;font-weight:700;color:var(--ink-2);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.sec h4 .no{background:var(--ink);color:#fff;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:700}
+.evgrid{display:flex;gap:18px;flex-wrap:wrap;font-size:12px}
+.evgrid .ev b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.evgrid .ev span{color:var(--muted);font-size:10.5px}
+.state td.st{font-weight:700}
+.state tr.sus td.st{color:#b26a00}
+.state tr.ver td.st{color:var(--brand)}
+.scengrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:680px){.scengrid{grid-template-columns:1fr}}
+.scen{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:var(--surface-2)}
+.scen.mid{border-color:var(--brand-3);background:var(--brand-soft)}
+.scen .t{font-size:11px;font-weight:700;color:var(--ink-2)}
+.scen .v{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.scen .u{font-size:10.5px;color:var(--muted)}
+.rec{border:1px dashed var(--warn);border-radius:8px;background:#fffaf0;padding:10px 12px;font-size:12px;line-height:1.7}
+.rec .rtag{display:inline-block;background:var(--warn);color:#fff;border-radius:4px;font-size:10px;font-weight:700;padding:1px 7px;margin-right:6px;vertical-align:1px}
+.rec .src{color:var(--muted);font-size:10.5px;margin-top:6px}
+.mini{color:var(--muted);font-size:10.5px;margin-top:4px}
+.tasklink{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--muted)}
+details.cal{border-top:1px solid var(--border);padding:10px 14px;font-size:11.5px;color:var(--ink-2)}
+details.cal summary{cursor:pointer;font-weight:700;color:var(--muted)}
+details.cal ul{margin:8px 0 4px 18px}
+details.cal li{margin-bottom:4px}
+.loading{padding:60px;text-align:center;color:var(--muted);font-size:12px}
+footer{color:var(--muted);font-size:11px;text-align:center;margin-top:16px}
+footer a{color:var(--brand);font-weight:600}
+footer a:hover{text-decoration:underline}
+.trend{display:flex;align-items:flex-end;gap:3px;height:64px;margin-top:6px}
+.trend i{flex:1;background:var(--brand-3);border-radius:2px 2px 0 0;min-height:2px}
+.trend i.hot{background:var(--brand)}
+.tl{display:flex;gap:3px;margin-top:3px}
+.tl span{flex:1;text-align:center;font-size:9px;color:var(--muted);min-width:0}
+/* 长文本列允许换行，避免任务号 / 排查方向被省略号截断 */
+td.wrap{white-space:normal;line-height:1.5;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav">
+    <a class="nav-link" href="/">AI 经营驾驶舱</a>
+    <a class="nav-link" href="/dashboard.html">全国经营驾驶舱</a>
+    <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+    <a class="nav-link" href="/pos.html">POS 分析</a>
+    <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+    <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+    <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+    <a class="nav-link" href="/sc.html">供应链看板</a>
+  </div>
+
+  <div class="pagehead">
+    <div>
+      <h1>机会引擎<span class="h1-sub">机会一 · 高增长 SKU 渗透</span></h1>
+      <div class="sub">识别高增长 SKU → 匹配无销售门店 → 联合 SFA 判三态（无 POS ≠ 未上架）→ 分位数测算潜在增量 → 铺货建议</div>
+    </div>
+    <div class="chips">
+      <span class="chip ai">AI 分析层 · 进攻线</span>
+      <span class="chip ro">ETL 主库 · 只读</span>
+      <span class="chip draft">研判初稿 · 待验证</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- 左：高增长 SKU 列表 -->
+    <div class="card">
+      <h2>高增长 SKU <span class="h2-sub" id="hgCount">YoY ≥ +20% 且 Y26 ≥ ¥100 万</span></h2>
+      <div class="listbar">
+        <b id="hgTotal">— 个 SKU</b>
+        <span>点击行查看机会卡片</span>
+        <div class="sorts">
+          <button data-k="yoy_pct" class="on">增速</button>
+          <button data-k="gap_stores">缺口</button>
+          <button data-k="inc_p50_boxes">增量</button>
+        </div>
+      </div>
+      <div class="listwrap">
+        <table>
+          <thead><tr>
+            <th style="width:26%">SKU</th>
+            <th style="width:26%">名称</th>
+            <th class="num" style="width:13%">YoY</th>
+            <th class="num" style="width:11%">缺口</th>
+            <th class="num" style="width:12%">待核实</th>
+            <th class="num" style="width:12%">P50 增量</th>
+          </tr></thead>
+          <tbody id="hgRows"><tr><td colspan="6" class="loading">加载中…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 右：单 SKU 机会卡片 -->
+    <div class="card" id="cardBox">
+      <div class="loading" id="cardLoading">加载机会卡片…</div>
+    </div>
+  </div>
+
+  <details class="cal card" id="calBox" style="padding:0">
+    <summary style="padding:10px 14px">口径与数据边界（点开查看）</summary>
+    <div style="padding:0 14px 12px" id="calBody"></div>
+  </details>
+
+  <footer><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a> · 数据来自 /api/gap/*（只读，ETL V1 主库）· 六步流水线为确定性规则，研判文案为模板初稿、标「待验证」</footer>
+</div>
+
+<script>
+const fmt = n => (n===null||n===undefined) ? '—' : Number(n).toLocaleString('zh-CN');
+let SKUS=[], META=null, CUR='G25-25', SORTK='yoy_pct', ASC=false;
+
+async function j(url){ const r = await fetch(url); return r.json(); }
+
+function renderList(){
+  const rows = [...SKUS].sort((a,b)=>{
+    const x=a[SORTK]??-1, y=b[SORTK]??-1;
+    return ASC ? x-y : y-x;
+  });
+  document.getElementById('hgRows').innerHTML = rows.map(r=>`
+    <tr class="gaprow${r.sku_code===CUR?' pick':''}" data-c="${r.sku_code}">
+      <td class="skucode">${r.sku_code}</td>
+      <td>${r.sku_name||'—'}</td>
+      <td class="num yoy">+${r.yoy_pct}%</td>
+      <td class="num">${r.gap_stores}</td>
+      <td class="num">${r.to_verify}</td>
+      <td class="num">${r.inc_p50_boxes?fmt(Math.round(r.inc_p50_boxes)):'—'}</td>
+    </tr>`).join('');
+  document.getElementById('hgTotal').textContent = SKUS.length + ' 个 SKU';
+  document.querySelectorAll('#hgRows tr').forEach(tr=>{
+    tr.addEventListener('click', ()=>{ CUR = tr.getAttribute('data-c'); loadCard(); });
+  });
+}
+
+function scenHtml(s){
+  if(!s) return '<div class="mini">在售门店不足两家，无法给出分位数测算（如实说明，不编数）。</div>';
+  return `<div class="scengrid">
+    <div class="scen"><div class="t">保守 · P25</div><div class="v">${fmt(s.p25.boxes)}<span class="u"> 盒/月</span></div><div class="u">≈ ¥${s.p25.amount_wan} 万/月</div></div>
+    <div class="scen mid"><div class="t">中性 · P50（推荐基准）</div><div class="v">${fmt(s.p50.boxes)}<span class="u"> 盒/月</span></div><div class="u">≈ ¥${s.p50.amount_wan} 万/月</div></div>
+    <div class="scen"><div class="t">乐观 · P75</div><div class="v">${fmt(s.p75.boxes)}<span class="u"> 盒/月</span></div><div class="u">≈ ¥${s.p75.amount_wan} 万/月</div></div>
+  </div>`;
+}
+
+function trendHtml(t){
+  if(!t || !t.length) return '<div class="mini">无月度数据</div>';
+  const mx = Math.max(...t.map(x=>x.boxes));
+  return `<div class="trend">${t.map(x=>
+    `<i class="${x.month>=9?'hot':''}" style="height:${Math.max(4, x.boxes/mx*64)}px" title="${x.month}月 ${fmt(x.boxes)} 盒 ¥${x.amount_wan} 万"></i>`).join('')}
+  </div><div class="tl">${t.map(x=>`<span>${x.month}</span>`).join('')}</div>
+  <div class="mini">2026 年逐月箱数（窗口月 9/10 加深）；hover 看明细</div>`;
+}
+
+function renderCard(d){
+  const g = d.growth, c = d.coverage, b = d.benchmark;
+  const stateRows = d.gap_detail.map(r=>`
+    <tr class="${r.state==='疑似缺货'?'sus':'ver'}">
+      <td>${r.store_name}</td>
+      <td>${r.region||'—'}</td>
+      <td class="st">${r.state}</td>
+      <td class="num">${r.visits}</td>
+      <td class="num">${r.display_collected}</td>
+      <td>${r.last_visit||'—'}</td>
+    </tr>`).join('');
+  const soldRows = b.sold_detail.slice(0,8).map(r=>`
+    <tr><td>${r.store_name}</td><td>${r.region||'—'}</td>
+    <td class="num">${fmt(r.boxes_month)}</td></tr>`).join('');
+  const taskRows = d.sfa_tasks.map(t=>`
+    <tr><td class="tasklink wrap" title="${t.task_id}">${t.task_id}</td><td class="wrap">${t.store_name}</td>
+    <td>${t.region||'—'}</td><td class="wrap">${t.task}</td><td>${t.last_visit||'—'}</td></tr>`).join('');
+  const clueRows = d.oos_clues.map(o=>`
+    <tr><td class="wrap">${o.store_name}</td><td>${o.region||'—'}</td><td class="wrap">${o.clue}</td></tr>`).join('');
+
+  document.getElementById('cardBox').innerHTML = `
+    <div class="chead">
+      <h3>${d.sku_name}</h3><span class="code">${d.sku_code}</span>
+      <span class="badge grow">YoY +${g.yoy_pct}%</span>
+      ${c.gap_stores?`<span class="badge sus">疑似缺货 ${c.suspect_oos}</span>
+      <span class="badge ver">待核实 ${c.to_verify}</span>`
+      :'<span class="badge none">本期无缺口</span>'}
+      ${d.high_growth?'':'<span class="badge none">未过筛选门槛</span>'}
+    </div>
+    <div class="sec">
+      <h4><span class="no">1</span>增速证据（全国 POS 口径）</h4>
+      <div class="evgrid">
+        <div class="ev"><b>¥${g.y25_amount_wan} 万</b><span>Y25 销售额</span></div>
+        <div class="ev"><b>¥${g.y26_amount_wan} 万</b><span>Y26 销售额</span></div>
+        <div class="ev"><b style="color:var(--up)">+${g.yoy_pct}%</b><span>YoY（metric_pos_yoy）</span></div>
+      </div>
+      ${trendHtml(g.trend_2026)}
+    </div>
+    <div class="sec">
+      <h4><span class="no">2</span>缺口门店 · 三态研判（27 家对齐门店，2026-09/10 连续两月无销售）</h4>
+      ${c.gap_stores ? `<table class="state">
+        <thead><tr><th style="width:32%">门店</th><th style="width:11%">战区</th>
+        <th style="width:13%">状态</th><th class="num" style="width:11%">拜访次数</th>
+        <th class="num" style="width:13%">陈列采集</th><th style="width:20%">最近拜访</th></tr></thead>
+        <tbody>${stateRows}</tbody></table>
+        <div class="mini">「确认未上架」当前数据不可判定：拜访统一记录「果萃SKU已全部上架」，无逐 SKU 上架明细——如实标注，不猜。</div>`
+      : '<div class="mini">全部 27 家在售，本期无缺口。</div>'}
+    </div>
+    <div class="sec">
+      <h4><span class="no">3</span>基准与测算（在售 ${b.stores} 家 · 单店月均箱数分位数）</h4>
+      ${scenHtml(d.scenarios)}
+      <div class="mini">P25/P50/P75 = ${b.p25??'—'} / ${b.p50??'—'} / ${b.p75??'—'} 盒/月 × 缺口 ${c.gap_stores} 家；金额按 Mock 均价估算。基准选 P50 中位数，避免单店极端值放大上分位。</div>
+    </div>
+    ${c.gap_stores?`<div class="sec">
+      <h4><span class="no">4</span>SFA 核实任务（待核实门店 · 自动生成）</h4>
+      ${taskRows?`<table><thead><tr><th style="width:17%">任务号</th><th style="width:15%">门店</th>
+      <th style="width:8%">战区</th><th>任务内容</th><th style="width:13%">上次拜访</th></tr></thead>
+      <tbody>${taskRows}</tbody></table>`:'<div class="mini">无待核实门店。</div>'}
+      <div class="mini">任务为建议清单（待验证），需业务确认后派发，不自动写入 SFA 系统。</div>
+    </div>
+    <div class="sec">
+      <h4><span class="no">5</span>疑似缺货排查方向（不生成任务，给线索）</h4>
+      ${clueRows?`<table><thead><tr><th style="width:20%">门店</th><th style="width:10%">战区</th><th>排查方向</th></tr></thead>
+      <tbody>${clueRows}</tbody></table>`:'<div class="mini">无疑似缺货门店。</div>'}
+    </div>`:''}
+    <div class="sec">
+      <h4><span class="no">6</span>铺货建议 · 研判初稿</h4>
+      <div class="rec"><span class="rtag">待验证</span>${d.recommendation.draft}
+        <div class="src">${d.recommendation.generated_by}</div>
+      </div>
+    </div>`;
+  document.getElementById('cardBox').classList.remove('card');
+  document.getElementById('cardBox').classList.add('card');
+}
+
+function renderCal(){
+  const m = META;
+  document.getElementById('calBody').innerHTML = `
+    <b>口径</b><ul>${m.caliber.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <b>数据事实</b><ul>${m.data_facts.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <b>不提供</b><ul>${m.not_provided.map(x=>`<li>${x.metric}：${x.reason}</li>`).join('')}</ul>
+    <b>阈值</b><ul><li>YoY ≥ +${m.thresholds.yoy_min_pct}% 且 Y26 ≥ ¥${m.thresholds.y26_amount_min_yuan/10000} 万；窗口 ${m.thresholds.window.join(' / ')}</li></ul>`;
+}
+
+async function loadCard(){
+  document.getElementById('cardBox').innerHTML = '<div class="loading" id="cardLoading">加载机会卡片…</div>';
+  renderList();
+  const p = await j('/api/gap/card?sku='+encodeURIComponent(CUR));
+  if(!p.ok){ document.getElementById('cardBox').innerHTML =
+    '<div class="loading">'+p.error+'</div>'; return; }
+  renderCard(p.data);
+}
+
+(async()=>{
+  const pm = await j('/api/gap/meta');
+  META = pm.meta;
+  document.getElementById('hgCount').textContent =
+    `YoY ≥ +${META.thresholds.yoy_min_pct}% 且 Y26 ≥ ¥${META.thresholds.y26_amount_min_yuan/10000} 万`;
+  renderCal();
+  const ps = await j('/api/gap/skus');
+  SKUS = ps.data.items;
+  if(!SKUS.some(x=>x.sku_code===CUR) && SKUS.length) CUR = SKUS[0].sku_code;
+  renderList();
+  await loadCard();
+})();
+
+document.querySelectorAll('.sorts button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const k = b.getAttribute('data-k');
+    if(SORTK===k){ ASC=!ASC; } else { SORTK=k; ASC=false; }
+    document.querySelectorAll('.sorts button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    renderList();
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+/* =====================================================================
+   board.css — 三个新看板共用样式（SFA 拜访 / SFA 门店画像 / 批发经营）
+   叠加在 styles.css + nav.css 之上；只新增 class，不覆盖既有规则。
+   视觉语言与「综合经营分析 V2」一致：浅灰蓝底 / 白卡 / 蓝主色 / 8px 圆角。
+   ===================================================================== */
+
+/* ------------------------------------------------------------ 页头 */
+.board-topbar { align-items: flex-end; }
+.board-topbar .title-block { align-self: center; }
+.board-filters { gap: 8px; }
+.board-filters .fitem { min-width: 104px; max-width: 190px; }
+
+/* ------------------------------------------------------------ 口径提示 */
+.notice {
+  display: flex; align-items: flex-start; gap: 8px;
+  border-radius: var(--radius); padding: 8px 12px; margin-bottom: 10px;
+  font-size: 11px; line-height: 1.55; border: 1px solid;
+}
+.notice b { font-weight: 750; }
+.notice-info    { background: #f1f7ff; border-color: #d5e5fb; color: #3a5478; }
+.notice-warn    { background: #fffaf0; border-color: #f6e2bd; color: #8a6218; }
+.notice-alert   { background: #fdf3f2; border-color: #f5d6d2; color: #a2403c; }
+.notice .notice-act { margin-left: auto; display: flex; gap: 6px; flex: 0 0 auto; }
+.notice .notice-body { flex: 1; min-width: 0; }
+.notice .notice-body b { color: inherit; }
+.notice code {
+  background: rgba(26, 42, 68, .06); border-radius: 3px; padding: 0 4px;
+  font-size: 10.5px;
+}
+
+/* ------------------------------------------------------------ KPI */
+.kpi-row.six { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.kpi-row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpi-card .kpi-sub {
+  margin-top: 2px; font-size: 10px; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kpi-card.is-muted { border-top-color: #cbd6e4; }
+.kpi-card.is-muted .kpi-value { color: #93a1b5; }
+.kpi-value.is-text { font-size: 19px; letter-spacing: 0; }
+.kpi-card.accent-teal { --accent: #0e9f8a; }
+.kpi-card.accent-amber { --accent: #e8a33d; }
+.kpi-card.accent-purple { --accent: #7c63d6; }
+.kpi-card.accent-red { --accent: #df4640; }
+
+/* ------------------------------------------------------------ 图表网格 */
+.board-grid { display: grid; gap: 12px; }
+.board-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.board-grid.one { grid-template-columns: minmax(0, 1fr); }
+.board-grid .card { min-height: 0; }
+.board-grid .card.tall { min-height: 268px; }
+
+/* ------------------------------------------------------------ 目标完成进度（bullet） */
+.bullet-list { display: flex; flex-direction: column; gap: 7px; padding: 2px 1px; }
+.bullet-row {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) 62px 58px;
+  align-items: center; gap: 9px; font-size: 11px;
+}
+.bullet-name { font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.bullet-track {
+  position: relative; height: 13px; border-radius: 4px;
+  background: #eef3fb; border: 1px solid #e6eef9; overflow: hidden;
+}
+.bullet-fill {
+  position: absolute; inset: 0 auto 0 0; border-radius: 3px;
+  background: linear-gradient(90deg, #2f6fe4, #5b9bf8);
+}
+.bullet-fill.is-miss { background: linear-gradient(90deg, #e8a33d, #f0bf6b); }
+.bullet-fill.is-over { background: linear-gradient(90deg, #0e9f8a, #4cc2ae); }
+.bullet-target {
+  position: absolute; top: -2px; bottom: -2px; width: 2px;
+  background: #1a2a44; opacity: .55;
+}
+.bullet-value {
+  text-align: right; font-variant-numeric: tabular-nums;
+  color: var(--ink-2); white-space: nowrap;
+}
+.bullet-value b { color: var(--ink); }
+.bullet-rate {
+  text-align: right; font-weight: 750; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bullet-rate.is-miss { color: var(--up); }
+.bullet-rate.is-ok { color: var(--down); }
+.bullet-rate.is-none { color: var(--muted); font-weight: 500; }
+.bullet-head {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) 62px 58px; gap: 9px;
+  font-size: 9.5px; color: var(--muted); padding: 0 1px 3px;
+}
+.bullet-head span:nth-child(3) { text-align: right; }
+.bullet-head span:nth-child(4) { text-align: right; }
+
+/* 战区卡内的补充小表：把「客户经理数 / 负责门店 / 覆盖 / 重复」摊开，避免卡片留白 */
+.tbl-wrap.region-tbl { margin-top: 8px; max-height: none; border: 0; }
+.tbl-wrap.region-tbl table.data th { padding: 4px 7px; font-size: 9.5px; }
+.tbl-wrap.region-tbl table.data td { padding: 4px 7px; font-size: 10px; }
+.tbl-wrap.region-tbl table.data th:first-child { text-align: left; }
+
+/* ------------------------------------------------------------ 事实清单（覆盖 / 重复） */
+.fact-list { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+.fact-row {
+  display: flex; align-items: baseline; gap: 8px; padding: 5px 2px;
+  border-bottom: 1px dashed var(--border); font-size: 11px;
+}
+.fact-row:last-child { border-bottom: 0; }
+.fact-row .k { color: var(--muted); }
+.fact-row .v {
+  margin-left: auto; font-weight: 750; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.fact-row .v.warn { color: var(--warn); }
+.fact-row .v.bad { color: var(--up); }
+.fact-row .hint { font-size: 9.5px; color: #a8b3c2; }
+
+/* 覆盖环图 + 事实清单并排 */
+.coverage-wrap { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.coverage-wrap .donut-wrap { flex: 0 0 auto; }
+.coverage-wrap .fact-list { flex: 1; min-width: 150px; }
+
+/* ------------------------------------------------------------ 明细：工具栏 / 表格 */
+.board-detail-head {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.board-detail-head .grow { flex: 1; }
+.seg-label { font-size: 9.5px; color: var(--muted); margin-right: 2px; }
+table.data td.drill { cursor: pointer; color: var(--brand); font-weight: 700; }
+table.data td.drill:hover { text-decoration: underline; }
+table.data td.muted { color: var(--muted); }
+table.data td.rate-ok { color: var(--down); font-weight: 750; }
+table.data td.rate-miss { color: var(--up); font-weight: 750; }
+table.data td.rate-none { color: var(--muted); }
+table.data th.group-start, table.data td.group-start { border-left: 1px solid #dde7f4; }
+.badge-cell {
+  display: inline-block; border-radius: 3px; padding: 0 5px; font-size: 9.5px;
+  font-weight: 700; line-height: 15px;
+}
+.badge-ok   { background: #e8f7f1; color: #0b7a68; }
+.badge-miss { background: #fdeeec; color: #b03c37; }
+.badge-none { background: #eef1f6; color: #7b8ea8; }
+.badge-warn { background: #fff5e2; color: #a56a12; }
+/* 示例目标（DEMO）：必须一眼可辨，不能与真实数据混淆 */
+.badge-demo { background: #f0ecfd; color: #6b46c1; border: 1px solid #ddd2f8; }
+.demo-flag {
+  font-style: normal; font-size: 9px; font-weight: 700; color: #6b46c1;
+  background: #f0ecfd; border-radius: 3px; padding: 0 3px; margin-left: 3px;
+}
+.chip-demo { background: #f0ecfd; color: #6b46c1; border: 1px solid #ddd2f8; font-weight: 700; }
+
+/* ------------------------------------------------------------ 表单 / 弹窗 */
+.modal-card {
+  width: min(880px, 92vw); max-height: 88vh; background: var(--surface);
+  border-radius: 10px; box-shadow: 0 18px 60px rgba(20, 40, 70, .22);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-mask.centered { align-items: center; justify-content: center; }
+.modal-head {
+  padding: 13px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.modal-head h3 { margin: 0; font-size: 14px; }
+.modal-head .sub { color: var(--muted); font-size: 11px; }
+.modal-head .btn { margin-left: auto; }
+.modal-body { padding: 14px 18px; overflow: auto; flex: 1; }
+.modal-foot {
+  padding: 10px 18px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted);
+}
+.modal-foot .spacer { flex: 1; }
+
+.form-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px 10px;
+  align-items: end;
+}
+.form-grid .fitem { min-width: 0; }
+.form-grid input, .form-grid select, .form-grid textarea {
+  height: 30px; border: 1px solid var(--border-strong); border-radius: 5px;
+  background: var(--surface-2); color: var(--ink); padding: 0 8px; font-size: 11.5px;
+  outline: none; width: 100%;
+}
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
+  border-color: var(--brand); background: #fff;
+}
+.form-grid textarea { height: 132px; padding: 7px 8px; resize: vertical; line-height: 1.5;
+                     font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; }
+.form-grid .span-4 { grid-column: span 4; }
+.form-grid .span-2 { grid-column: span 2; }
+.form-hint { font-size: 10px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.form-msg { font-size: 11px; margin-top: 8px; }
+.form-msg.ok { color: var(--down); }
+.form-msg.err { color: var(--up); }
+
+/* ------------------------------------------------------------ 空态卡内提示 */
+.inline-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; min-height: 120px; color: var(--muted); font-size: 11px; text-align: center;
+  padding: 10px;
+}
+.inline-empty b { color: var(--ink-2); font-size: 12px; }
+
+/* ------------------------------------------------------------ 响应式 */
+@media (max-width: 1440px) {
+  .kpi-row.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1280px) {
+  .board-grid.two { grid-template-columns: minmax(0, 1fr); }
+  .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-grid .span-4 { grid-column: span 2; }
+}

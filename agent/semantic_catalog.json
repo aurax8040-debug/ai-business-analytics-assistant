@@ -1,0 +1,76 @@
+{
+  "version": "chatbi-semantic-v1",
+  "metrics": {
+    "erp_te": {
+      "name": "ERP 实际出货 TE",
+      "definition": "星禾向客户出货的 Sell-in TE，来自 ERP 出货记录，不等于终端零售。",
+      "unit": "TE",
+      "fields": ["te"],
+      "synonyms": ["erp出货", "erp 出货", "实际出货", "出货量", "sell-in", "sell in", "sellin"],
+      "tool": "query_erp_actual",
+      "dimensions": ["month", "region", "department", "customer", "segment", "category"]
+    },
+    "pos_sales_te": {
+      "name": "POS 终端销售 TE",
+      "definition": "已接入 POS 门店的 Sell-out 终端销售 TE；覆盖范围有限，不与 ERP 出货相加。",
+      "unit": "TE",
+      "fields": ["sales_te"],
+      "synonyms": ["pos动销", "pos 动销", "终端动销", "终端销量", "pos销售", "pos 销售", "pos终端销售", "pos 终端销售", "sell-out", "sell out", "sellout"],
+      "tool": "query_pos_performance",
+      "dimensions": ["month", "region", "department", "ka_system", "store", "category"]
+    },
+    "budget_te": {
+      "name": "预算 TE",
+      "definition": "指定客户、市场部和月份范围内的 TE 预算之和；无 SKU 和金额口径。",
+      "unit": "TE",
+      "fields": ["budget_te"],
+      "synonyms": ["预算te", "预算 te", "te预算", "te 预算", "销量预算"],
+      "tool": "query_budget",
+      "dimensions": ["month", "region", "department", "customer", "segment"]
+    },
+    "attainment_pct": {
+      "name": "预算达成率",
+      "definition": "同一范围、同一期间的 ERP 实际出货 TE ÷ 预算 TE × 100%。",
+      "unit": "%",
+      "fields": ["attainment_pct"],
+      "synonyms": ["达成率", "完成率", "预算达成", "目标达成"],
+      "tool": "query_customer_performance",
+      "dimensions": ["month", "region", "department", "customer", "segment"]
+    },
+    "gross_margin_pct": {
+      "name": "ERP 毛利率",
+      "definition": "ERP 出货范围内 Σ毛利额 ÷ Σ出货金额 × 100%。",
+      "unit": "%",
+      "fields": ["gross_margin_pct"],
+      "synonyms": ["毛利率", "利润率"],
+      "tool": "query_erp_actual",
+      "dimensions": ["month", "region", "department", "customer", "segment", "category"]
+    },
+    "sfa_completion_pct": {
+      "name": "SFA 拜访完成率",
+      "definition": "SFA 覆盖期内已完成拜访次数 ÷ 拜访次数 × 100%；不是销量。",
+      "unit": "%",
+      "fields": ["completed_rate_pct"],
+      "synonyms": ["拜访完成率", "拜访达成", "sfa完成率", "sfa 完成率"],
+      "tool": "query_sfa_visit",
+      "dimensions": ["region", "department", "store", "ka_system"]
+    }
+  },
+  "dimensions": {
+    "month": {"name": "月份", "synonyms": ["月份", "月度", "每月", "按月", "趋势"]},
+    "region": {"name": "战区", "synonyms": ["战区", "区域", "大区"]},
+    "department": {"name": "市场部", "synonyms": ["市场部", "城市团队"]},
+    "customer": {"name": "客户", "synonyms": ["客户", "经销客户"]},
+    "segment": {"name": "客户类型", "synonyms": ["客户类型", "渠道类型"]},
+    "ka_system": {"name": "KA 系统", "synonyms": ["ka系统", "ka 系统", "商超系统"]},
+    "store": {"name": "门店", "synonyms": ["门店", "门店级", "单店"]},
+    "sku": {"name": "SKU", "synonyms": ["sku", "单品", "规格"]},
+    "category": {"name": "品类", "synonyms": ["品类", "果种"]}
+  },
+  "ambiguities": {
+    "销量": {
+      "choices": ["erp_te", "pos_sales_te"],
+      "clarification": "你说的“销量”是 ERP 出货（Sell-in）还是 POS 终端动销（Sell-out）？两者环节和覆盖范围不同，不能自动混用。"
+    }
+  }
+}

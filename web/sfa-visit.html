@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SFA 销售拜访分析 · Y26 2026 · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/board.css">
+<link rel="stylesheet" href="/agent-dock.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================================================== 顶部筛选区 -->
+  <header class="topbar board-topbar">
+    <div class="title-block">
+      <span class="title-bar"></span>
+      <h1>星禾食品 BI 数据中心</h1>
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link" href="/pos.html">POS 分析</a>
+      <a class="nav-link is-current" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+      <a class="nav-link" href="/sc.html">供应链看板</a>
+    </div>
+    <div class="filters board-filters" id="global-filters">
+      <div class="fitem"><label>月份</label><select id="f-month"></select></div>
+      <div class="fitem"><label>战区</label><select id="f-region"></select></div>
+      <div class="fitem"><label>市场部</label><select id="f-md"></select></div>
+      <div class="fitem"><label>客户经理</label><select id="f-employee"></select></div>
+      <button class="btn btn-reset" id="btn-reset">重置</button>
+    </div>
+  </header>
+
+  <div class="subbar">
+    <span class="chip chip-year" id="chip-period">Y26 · 2026 年 1–10 月</span>
+    <span class="chip plain" id="chip-window">数据窗口 —</span>
+    <span class="chip plain" id="chip-target">目标配置 —</span>
+    <span class="chip chip-demo hidden" id="chip-demo">目标为示例数据 DEMO</span>
+    <span id="active-chips" class="chips"></span>
+    <span class="subbar-right">
+      <span class="status" id="status-badge">就绪</span>
+      <button class="btn btn-sm btn-primary" id="btn-refresh">刷新</button>
+    </span>
+  </div>
+
+  <div class="alert alert-error hidden" id="alert"></div>
+
+  <!-- ===================================================== 数据窗口 / 目标缺口提示 -->
+  <div class="notice notice-info" id="notice-window">
+    <div class="notice-body" id="notice-window-text">正在读取 SFA 拜访事实…</div>
+  </div>
+  <div class="notice notice-warn hidden" id="notice-target">
+    <div class="notice-body" id="notice-target-text"></div>
+    <div class="notice-act">
+      <button class="btn btn-sm btn-primary" id="btn-config-target">配置月度目标</button>
+    </div>
+  </div>
+
+  <!-- ===================================================== 核心 KPI -->
+  <div class="row-label">
+    <b>核心拜访指标</b>
+    <span id="kpi-sub">完成率只在已配置目标的客户经理内计算 · 未配置不计入分子分母 · 金额类指标不参与本页</span>
+  </div>
+  <section class="kpi-row six" id="kpi-row" aria-label="核心拜访指标"></section>
+
+  <!-- ===================================================== 四张分析图 -->
+  <div class="row-label"><b>拜访执行分析</b><span id="chart-sub">战区完成 · 人员排名 · 月度趋势 · 覆盖与重复</span></div>
+  <section class="board-grid two">
+    <div class="card tall" id="card-region">
+      <div class="card-head"><h3>战区拜访完成情况</h3><span class="card-tag">目标 vs 实际</span></div>
+      <div class="bullet-head"><span>战区</span><span>完成进度（竖线 = 目标）</span><span>实际/目标</span><span>完成率</span></div>
+      <div class="bullet-list" id="chart-region"></div>
+      <div class="tbl-wrap region-tbl" id="region-tbl"></div>
+      <div class="card-foot" id="foot-region"></div>
+    </div>
+
+    <div class="card tall" id="card-rank">
+      <div class="card-head">
+        <h3>客户经理完成率排名</h3>
+        <div class="pill-tabs" id="rank-mode">
+          <button data-mode="rate" class="on">完成率</button><button data-mode="stores">拜访门店数</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-rank"></div>
+      <div class="card-foot" id="foot-rank"></div>
+    </div>
+
+    <div class="card tall" id="card-trend">
+      <div class="card-head">
+        <h3>月度拜访趋势</h3>
+        <div class="pill-tabs" id="trend-metric">
+          <button data-metric="stores" class="on">拜访门店</button><button data-metric="visits">拜访记录</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-trend"></div>
+      <div class="mini-legend" id="legend-trend"></div>
+      <div class="card-foot" id="foot-trend"></div>
+    </div>
+
+    <div class="card tall" id="card-coverage">
+      <div class="card-head"><h3>拜访覆盖与重复情况</h3><span class="card-tag">公司口径去重</span></div>
+      <div class="coverage-wrap">
+        <div class="chart-host" id="chart-coverage"></div>
+        <div class="fact-list" id="fact-coverage"></div>
+      </div>
+      <div class="card-foot" id="foot-coverage"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 口径说明 -->
+  <details class="capability-box" id="capability-box">
+    <summary><b>口径说明与数据限制</b><span id="capability-count"></span>
+      <span class="cap-hint">展开查看（示例目标必须标注、不补零、不修改 ETL）</span></summary>
+    <div class="capability-body" id="capability-list"></div>
+  </details>
+
+  <!-- ===================================================== 明细表 -->
+  <div class="row-label"><b>客户经理拜访明细</b><span id="detail-sub">点击客户经理可查看其负责门店与拜访记录</span></div>
+  <section class="card detail-card">
+    <div class="board-detail-head">
+      <div class="detail-search">
+        <input type="search" id="detail-q" placeholder="搜索客户经理 / 战区 / 市场部…" maxlength="40" autocomplete="off">
+      </div>
+      <span class="detail-hint" id="detail-sort-hint">点击表头可排序</span>
+      <span class="grow"></span>
+      <button class="btn btn-sm" id="btn-target-list">查看目标配置</button>
+    </div>
+    <div class="tbl-wrap detail-tbl" id="detail-table"></div>
+    <div class="detail-foot">
+      <span id="detail-count"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-sm" id="detail-prev">上一页</button>
+      <span id="detail-page" class="page-label"></span>
+      <button class="btn btn-sm" id="detail-next">下一页</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a></span>
+    <span><b>数据源</b> fact_sfa_visit / dim_employee / dim_store（ETL V1 只读）</span>
+    <span><b>目标</b> data/app_config.db（独立可写库；示例目标 DEMO 全程标注，可一键清除）</span>
+    <span><b>口径</b> P01 五大战区 / Y26 / 有效拜访 = 已拜访 + 门店 + 日期齐全</span>
+    <span><b>边界</b> 重复拜访不增加完成量 / 前端不重算指标 / 无静态假数据</span>
+  </footer>
+</div>
+
+<!-- ===================================================== 客户经理下钻抽屉 -->
+<div class="modal-mask hidden" id="modal">
+  <div class="drawer">
+    <div class="drawer-head">
+      <h3 id="drill-title">客户经理拜访明细</h3><span class="sub" id="drill-sub"></span>
+      <button class="btn btn-sm" style="margin-left:auto" id="drawer-close">关闭</button>
+    </div>
+    <div class="drawer-body">
+      <div class="kpi-row three" id="drill-kpi" style="margin-bottom:10px"></div>
+      <div class="row-label"><b>负责门店</b><span id="drill-store-sub"></span></div>
+      <div class="tbl-wrap" id="drill-stores" style="max-height:220px"></div>
+      <div class="row-label"><b>拜访记录</b><span id="drill-visit-sub"></span></div>
+      <div class="tbl-wrap" id="drill-visits" style="max-height:280px"></div>
+    </div>
+    <div class="drawer-foot"><span id="drill-note"></span></div>
+  </div>
+</div>
+
+<!-- ===================================================== 月度目标配置弹窗 -->
+<div class="modal-mask centered hidden" id="target-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>客户经理月度拜访目标配置</h3>
+      <span class="sub" id="target-sub">数据来自独立配置库</span>
+      <button class="btn btn-sm" id="target-close">关闭</button>
+    </div>
+    <div class="modal-body">
+      <div class="notice notice-warn" style="margin-bottom:10px">
+        <div class="notice-body">
+          当前库中<b id="target-count">0</b> 条目标。系统不会<b>静默</b>补默认值——
+          未配置的客户经理显示「未配置」，既不按 0 计、也不按平均补，不参与完成率。
+          如需先看完成率/排名/战区进度长什么样，可生成一组<b>示例目标（DEMO）</b>：
+          全程带「示例」标注，随时可清除，且不会覆盖任何真实目标。
+        </div>
+        <div class="notice-act">
+          <button class="btn btn-sm btn-primary" id="btn-seed-demo">生成示例目标</button>
+          <button class="btn btn-sm" id="btn-clear-demo">清除示例目标</button>
+        </div>
+      </div>
+      <div class="notice notice-info hidden" id="demo-note" style="margin-bottom:10px"></div>
+
+      <div class="row-label" style="margin-top:0"><b>单条新增 / 修改</b><span>同一「客户经理 + 年 + 月」重复提交即覆盖</span></div>
+      <div class="form-grid">
+        <div class="fitem"><label>客户经理 ID</label><input id="t-employee" list="employee-options" placeholder="MGR-001" maxlength="40"></div>
+        <div class="fitem"><label>客户经理姓名（可空）</label><input id="t-name" placeholder="自动取花名册" maxlength="40"></div>
+        <div class="fitem"><label>年份</label><input id="t-year" value="2026" maxlength="4"></div>
+        <div class="fitem"><label>月份</label><input id="t-month" placeholder="1–10" maxlength="2"></div>
+        <div class="fitem"><label>月度目标门店数</label><input id="t-value" placeholder="例如 20" maxlength="6"></div>
+        <div class="fitem"><label>配置状态</label><select id="t-status"><option value="ACTIVE">ACTIVE · 参与完成率</option><option value="DISABLED">DISABLED · 保留不参与</option></select></div>
+        <div class="fitem"><label>备注（可空）</label><input id="t-note" maxlength="60"></div>
+        <div class="fitem"><button class="btn btn-primary" id="t-save" style="width:100%">保存目标</button></div>
+      </div>
+      <datalist id="employee-options"></datalist>
+      <div class="form-msg" id="target-msg"></div>
+
+      <div class="row-label"><b>批量导入 CSV</b><span>表头：客户经理ID,客户经理姓名,年份,月份,月度目标门店数,配置状态,备注</span></div>
+      <div class="form-grid">
+        <div class="fitem span-4">
+          <textarea id="t-csv" placeholder="客户经理ID,客户经理姓名,年份,月份,月度目标门店数&#10;MGR-001,沈亦辰,2026,9,20&#10;MGR-002,沈清和,2026,9,18"></textarea>
+        </div>
+        <div class="fitem span-2"><button class="btn" id="t-import" style="width:100%">导入 CSV</button></div>
+        <div class="fitem span-2"><button class="btn" id="t-template" style="width:100%">填入表头模板</button></div>
+      </div>
+      <div class="form-msg" id="import-msg"></div>
+
+      <div class="row-label"><b>已配置目标</b><span id="target-list-sub"></span></div>
+      <div class="tbl-wrap" id="target-table" style="max-height:230px"></div>
+    </div>
+    <div class="modal-foot">
+      <span id="target-foot"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-sm" id="target-done">完成</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="/sfa-visit.js"></script>
+<script src="/page-context.js"></script>
+<script src="/agent-dock.js"></script>
+</body>
+</html>

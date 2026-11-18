@@ -1,0 +1,11 @@
+# 全国经营驾驶舱 V1 · 依赖清单
+#
+# 本阶段零第三方依赖，仅使用 Python 3.9+ 标准库与浏览器原生 ES Module：
+#   http.server / sqlite3 / json / urllib / logging / unittest / argparse
+#   Web: HTML5 + CSS3 + 原生 JavaScript (ES2020) + 自绘 SVG 图表
+#
+# 因此无需 pip install，也无需 npm install / 构建步骤。
+# pytest 若已安装可直接 `pytest -q` 收集 tests/ 下的 unittest 用例。
+#
+# 固定数据源（只读，不在本文件声明依赖）：
+#   ../bi_data_layer_v1/database/bi_data_layer_v1.db

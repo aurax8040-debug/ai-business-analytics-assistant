@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>战区销售分析已并入战区销售达成跟进 · Marketing Intelligence Platform</title>
+<!-- 产品架构修正：战区不再是独立一级看板，功能整体迁入「战区销售达成跟进」的战区维度 -->
+<meta http-equiv="refresh" content="0; url=/analysis.html?dimension=region">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<style>
+  .legacy-page { max-width: 720px; margin: 60px auto; padding: 0 20px; }
+  .legacy-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: var(--shadow); padding: 22px 26px;
+  }
+  .legacy-card h1 { margin: 0 0 8px; font-size: 18px; color: var(--brand); }
+  .legacy-card p { margin: 6px 0; color: var(--ink-2); font-size: 12px; line-height: 1.7; }
+  .legacy-card .row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="legacy-page">
+  <div class="legacy-card">
+    <h1>战区销售分析已并入「战区销售达成跟进」</h1>
+    <p>按新的产品架构，只保留一个战区销售达成跟进入口：战区、渠道、KA 系统、客户、品类、SKU
+       六个维度共用同一套筛选器、KPI、趋势、排名与明细。</p>
+    <p>原战区页的功能、图表与数据逻辑已完整迁入<b>战区维度</b>，不会丢失任何已验收能力。</p>
+    <div class="row">
+      <a class="nav-link" href="/analysis.html?dimension=region">进入战区维度 →</a>
+      <a class="nav-link" href="/analysis.html">战区销售达成跟进首页</a>
+      <a class="nav-link" href="/portal.html">页面目录</a>
+    </div>
+  </div>
+</div>
+<script>
+  // 保留可能携带的筛选参数，仅把页面指向新的维度入口
+  (function () {
+    var q = new URLSearchParams(location.search);
+    q.set('dimension', 'region');
+    location.replace('/analysis.html?' + q.toString());
+  })();
+</script>
+</body>
+</html>

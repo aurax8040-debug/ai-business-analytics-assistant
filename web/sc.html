@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>供应链看板：果萃到货与包材采购 · 星禾食品 BI 数据中心</title>
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/agent-dock.css">
+<style>
+:root{
+  --bg:#eaf0f8; --surface:#fff; --surface-2:#f6f9fd; --surface-3:#eef4fc;
+  --border:#e4ebf6; --border-strong:#d3dfef;
+  --ink:#16233a; --ink-2:#41546f; --muted:#8697ae;
+  --brand:#1a6ff0; --brand-2:#4f92f7; --brand-3:#9cc2fb; --brand-soft:#eaf2ff;
+  --up:#e5484d; --down:#10a06a; --warn:#eda33c;
+  --radius:10px; --radius-sm:6px; --shadow:0 1px 2px rgba(20,45,85,.04),0 6px 18px rgba(20,45,85,.05);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:13px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;padding:18px 22px 30px}
+.wrap{max-width:1180px;margin:0 auto}
+.topnav{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-bottom:12px}
+.topnav .sp{flex:1}
+.pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.pagehead h1{font-size:19px;font-weight:700;line-height:1.35}
+.pagehead h1 .h1-sub{font-size:14px;font-weight:600;color:var(--ink-2);margin-left:8px}
+.pagehead .sub{color:var(--muted);font-size:11.5px;margin-top:2px}
+.pagehead .chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-top:3px}
+.chip{background:var(--brand-soft);color:var(--brand);border-radius:6px;padding:2px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.chip.mock{background:#fff4e3;color:#b26a00}
+.chip.ro{background:var(--surface-3);color:var(--ink-2);border:1px solid var(--border)}
+select#f-month{border:1px solid var(--border-strong);border-radius:7px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:12px;font-weight:600;padding:4px 8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:14px}
+.card h3{font-size:13.5px;font-weight:700;margin-bottom:2px}
+.card .hint{color:var(--muted);font-size:11.5px;margin-bottom:10px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:1199px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--brand);border-radius:var(--radius);box-shadow:var(--shadow);padding:11px 13px 10px;display:flex;flex-direction:column}
+.kpi.arrive{border-top-color:var(--warn)}
+.kpi .lbl{color:var(--ink-2);font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .val{font-size:22px;font-weight:800;letter-spacing:-.6px;margin:2px 0 4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi .val .unit{font-size:11.5px;font-weight:600;color:var(--muted);margin-left:3px;letter-spacing:0}
+.kpi .foot{margin-top:auto;font-size:11px;line-height:1.5;color:var(--muted);min-height:33px}
+.kpi .foot .d{font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .foot .d.up{color:var(--up)} .kpi .foot .d.down{color:var(--down)}
+.kpi .foot .tag{font-size:9.5px;padding:0 5px;margin-right:4px;vertical-align:1px}
+.up{color:var(--up)} .down{color:var(--down)}
+.tag{display:inline-block;background:var(--surface-3);color:var(--ink-2);border:1px solid var(--border);border-radius:5px;font-size:10px;padding:1px 6px;font-weight:600;white-space:nowrap}
+.tag.est{background:#fff4e3;color:#b26a00;border-color:#f5dfc0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid2 .card{margin-bottom:14px}
+.card.full{grid-column:1/-1}
+.legend{display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:4px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.bomsum{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);padding:7px 11px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-bottom:9px}
+.bomsum b{color:var(--ink);font-variant-numeric:tabular-nums}
+.bombar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.seg{display:flex;background:var(--surface-3);border:1px solid var(--border);border-radius:7px;padding:2px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:5px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--brand);box-shadow:0 1px 2px rgba(20,45,85,.12)}
+#bomQ{flex:1;min-width:150px;padding:5px 9px;border:1px solid var(--border-strong);border-radius:7px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:11.5px}
+.mini{border:1px solid var(--border-strong);background:var(--surface-2);color:var(--ink-2);font:inherit;font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.mini:hover{border-color:var(--brand-3);color:var(--brand)}
+.bomtable{max-height:404px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+.bomtable table{font-size:11.5px;table-layout:fixed}
+.bomtable thead th{position:sticky;top:0;background:var(--surface-2);z-index:1}
+table{width:100%;border-collapse:collapse}
+th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--ink-2);font-size:11px;font-weight:700;background:var(--surface-2);white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td.sk{font-weight:600;color:var(--ink);white-space:nowrap}
+tr.pick{background:var(--brand-soft)}
+tr.pick td.sk{color:var(--brand)}
+td.cap.low{color:var(--up);font-weight:700}
+td.cap.mid{color:#b26a00;font-weight:700}
+td.cap.high{color:var(--ink);font-weight:700}
+td.bnm{color:var(--ink-2)}
+td.bnm b{color:var(--up)}
+.cmp{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.cmp-col{flex:1;min-width:200px;border:1px solid var(--border-strong);border-radius:9px;padding:10px 12px;position:relative;background:var(--surface-2)}
+.cmp-col .x{position:absolute;top:6px;right:8px;border:0;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.cmp-col .x:hover{color:var(--up)}
+.cmp-col .h{font-size:12px;font-weight:700;color:var(--ink)}
+.cmp-col .big{font-size:20px;font-weight:800;margin:3px 0 1px;font-variant-numeric:tabular-nums}
+.cmp-col .big span{font-size:11px;font-weight:600;color:var(--muted);margin-left:2px}
+.cmp-col .meta{font-size:10.5px;color:var(--muted);margin-bottom:7px}
+.cmp-col table{font-size:11px}
+.cmp-col tr.bn td{color:var(--up);font-weight:700;background:#fdeeee}
+.cmp-empty{font-size:12px;color:var(--muted);padding:10px 12px;border:1px dashed var(--border-strong);border-radius:9px;margin-top:10px}
+.cmp-note{margin-top:8px;font-size:11.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:7px 11px}
+.na-list div{font-size:11.5px;color:var(--ink-2);padding:4px 0 4px 0;border-bottom:1px dashed var(--border)}
+.na-list b{color:var(--ink)}
+.na-list div:last-child{border-bottom:0}
+tr.total td{font-weight:700;background:var(--surface-2);border-top:2px solid var(--border-strong)}
+footer{color:var(--muted);font-size:11px;text-align:center;margin-top:16px}
+footer a{color:var(--brand);text-decoration:none;font-weight:600}
+footer a:hover{text-decoration:underline}
+.barcell{width:100%;height:8px;background:var(--surface-3);border-radius:4px;overflow:hidden}
+.barcell i{display:block;height:100%;background:var(--down);border-radius:4px}
+#err{display:none;background:#fdeeee;border:1px solid #f2c4c4;color:#8f2323;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px}
+#loading{color:var(--muted);font-size:12px;padding:6px 0}
+/* ---- V2：生产 / 追溯 / 预测 ---- */
+.pstats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+@media(max-width:900px){.pstats{grid-template-columns:repeat(3,1fr)}}
+.pstat{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+.pstat .lbl{font-size:11px;color:var(--ink-2);font-weight:600}
+.pstat .v{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pstat .v .u{font-size:10.5px;color:var(--muted);font-weight:600;margin-left:2px}
+.tracebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tracebar input{border:1px solid var(--border-strong);border-radius:7px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:11.5px;padding:5px 9px}
+.tracebar .ti{min-width:150px}
+.tracechain{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:4px 0 10px;font-size:11.5px}
+.tracechain .tn{background:var(--brand-soft);color:var(--brand);border-radius:6px;padding:3px 9px;font-weight:700;white-space:nowrap}
+.tracechain .ar{color:var(--muted)}
+.tag.r-high{background:#fdeeee;color:#c62f2f;border-color:#f2c4c4}
+.tag.r-mid{background:#fff4e3;color:#b26a00;border-color:#f5dfc0}
+.tag.r-low{background:#e8f7f0;color:#0e7a5c;border-color:#c6e9da}
+tr.exp td{background:var(--surface-2);font-size:11px;color:var(--ink-2);line-height:1.7}
+tr.linkbatch td:first-child{cursor:pointer}
+tr.linkbatch td:first-child:hover{color:var(--brand)}
+.fsum{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);padding:7px 11px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-bottom:9px}
+.fsum b{color:var(--ink);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav">
+    <a class="nav-link" href="/">AI 经营驾驶舱</a>
+    <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+    <a class="nav-link" href="/pos.html">POS 分析</a>
+    <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+    <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+    <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+    <a class="nav-link is-current" href="/sc.html">供应链看板</a>
+  </div>
+
+  <div class="pagehead">
+    <div>
+      <h1>供应链看板<span class="h1-sub">果萃到货与包材采购</span></h1>
+      <div class="sub">星禾代理果萃 · 果子到港直接入库（只看数量）· 采购仅在包材（8 种配件 + 成本价）</div>
+    </div>
+    <div class="chips">
+      <select id="f-month" title="月末快照月份"></select>
+      <span class="chip mock">MOCK_SUPPLY_CHAIN</span>
+      <span class="chip ro">只读 · 月末快照</span>
+    </div>
+  </div>
+
+  <div id="err"></div>
+  <div id="loading">加载中 …</div>
+
+  <details class="card" style="padding:8px 14px">
+    <summary style="font-size:12px;color:var(--ink-2);font-weight:600;cursor:pointer">业务口径（完整版 · 点击展开）</summary>
+    <div class="hint" style="margin-top:6px">1）星禾是果萃中国代理，不是果园采购方：果子无采购，产区A发船 → 到港直接入库（分型号数量），供应链核心是到货时间与数量。2）采购只发生在包材：8 种配件向 5 家供应商下 PO，带成本价。3）组装按 BOM：每盒 4 项主材（果子用量=粒数 + 包装盒×1 + 内托×1（2 粒装不使用）+ 网套=粒数），辅材 5 项按装箱率摊入。4）结算价不建模（财务域）。页面展示原则：果子只显示数量，包材显示配件与成本价。</div>
+  </details>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <h3>成品月度出入库与期末余额</h3>
+    <div class="hint">柱=当月入库（分选组盒） / 出库（ERP）；折线=期末库存（右轴）· 2026-01 ~ 2026-10 · 单位：盒</div>
+    <div id="trend"></div>
+    <div class="legend">
+      <span><i style="background:#2f6fe4"></i>入库</span>
+      <span><i style="background:#0e9f8a"></i>出库</span>
+      <span><i style="background:#e8a33d"></i>期末余额（右轴）</span>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>果萃到货节奏（产区A → 到港入库）</h3>
+      <div class="hint" id="arrHint">柱=当月到货量（粒，左轴）· 点=批次数（右轴）</div>
+      <div id="arrival"></div>
+      <div class="hint" style="margin-top:6px" id="delayHint"></div>
+    </div>
+    <div class="card">
+      <h3>果萃原料批次库龄</h3>
+      <div class="hint" id="agingHint">以月末为观察点，按到港日计算 · 空桶如实显示 0 批</div>
+      <div id="aging"></div>
+      <div class="hint" style="margin-top:8px" id="oldestHint"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card full" id="whCard">
+      <h3>期末库存按仓库分布</h3>
+      <div class="hint" id="whHint">三层（原料 / 包材 / 成品）仓库月末分布</div>
+      <div id="wh"></div>
+    </div>
+    <div class="card full" id="bomCard">
+      <h3>SKU 可支撑能力与多选对比 <span class="tag" id="skuTag">全量 SKU</span></h3>
+      <div class="hint">可支撑盒数 = min(果子、各包材 期末库存 ÷ 单盒用量) · 月末快照 · 默认按最受限排序 · <b style="color:#16233a">勾选 2–4 个 SKU 并排对比</b></div>
+      <div class="bomsum" id="bomSum"></div>
+      <div class="bombar">
+        <div class="seg" id="bomSeg">
+          <button data-k="all" class="on">全部</button>
+          <button data-k="品类A">品类A</button>
+          <button data-k="品类B">品类B</button>
+          <button data-k="品类C">品类C</button>
+        </div>
+        <input id="bomQ" type="search" placeholder="搜 SKU / 果径 / 粒装，如 27# 或 J27">
+        <button id="bomSort" class="mini">排序：可支撑 ↑</button>
+        <button id="bomClear" class="mini">清空已选</button>
+      </div>
+      <div class="bomtable">
+        <table>
+          <thead><tr>
+            <th style="width:30px"></th><th>SKU</th><th>品类</th><th class="num">粒装</th>
+            <th class="num">果子可用</th><th class="num">可支撑盒数</th><th>瓶颈</th><th class="num">单盒成本</th>
+          </tr></thead>
+          <tbody id="bomRows"></tbody>
+        </table>
+      </div>
+      <div class="hint" id="bomCount" style="margin-top:6px"></div>
+      <div id="bomCompare"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>规格 × 单盒用量（全 72 个 SKU 汇总）<span class="tag">果子用量 = 每盒粒数</span></h3>
+    <div class="hint">3 品类（品类A / 品类B / 品类C）× 8 果径 × 14 种粒装 = 72 个 SKU · 同一粒装的配方完全一致，差异只在果径与品类</div>
+    <table>
+      <thead><tr><th>粒装规格</th><th class="num">SKU 数</th><th class="num">果子（粒）</th><th class="num">包装盒（个）</th><th class="num">内托（个）</th><th class="num">网套（个）</th><th class="num">单盒包材成本</th><th class="num">包材可支撑盒数</th></tr></thead>
+      <tbody id="speclist"></tbody>
+    </table>
+    <div class="hint" style="margin-top:8px">单盒包材成本 = Σ(主材 + 辅材用量 × 最近 PO 单价)，不含果子（代理到货无采购价）· 包材可支撑盒数只算包材，叠加果子库存后的实际可组盒数见上一卡</div>
+  </div>
+
+  <div class="card">
+    <h3>包材配件库存与成本价 <span class="tag est">金额为估算</span></h3>
+    <div class="hint">8 种配件 · 期末库存 × 最近一次 PO 成本单价 · 采购只发生在包材</div>
+    <table>
+      <thead><tr><th>配件</th><th class="num">成本单价（最近 PO）</th><th class="num">期末库存</th><th>单位</th><th class="num">库存金额（估算）</th></tr></thead>
+      <tbody id="pmbody"></tbody>
+    </table>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>包材供应商到货</h3>
+      <div class="hint">5 家包材供应商（果子无供应商）· 准时=实际到货日 ≤ 应到日 · 在途不计入分母</div>
+      <table>
+        <thead><tr><th>供应商</th><th class="num">已到订单</th><th class="num">准时</th><th class="num">在途</th><th style="width:110px">准时率</th></tr></thead>
+        <tbody id="supbody"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>在途采购（未到期）</h3>
+      <div class="hint" id="itHint">已下单未到货 · 在途未到期 ≠ 延迟 · 展示前 5 张</div>
+      <table>
+        <thead><tr><th>PO 号</th><th>配件</th><th class="num">订购量</th><th class="num">应到日</th><th>状态</th></tr></thead>
+        <tbody id="itbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>果萃到货批次库存明细 <span class="tag">TOP 10 · 按期末数量</span></h3>
+    <div class="hint">含船次号（ZSP）与 ETA/实到对比 · 完整批次级数据走 /api/sc/batches 分页 · 原料层追溯见下方「批次追溯链」</div>
+    <table>
+      <thead><tr><th>批次号</th><th>原料</th><th>仓库</th><th>船次号</th><th class="num">ETA</th><th class="num">实到</th><th class="num">期末数量（粒）</th><th class="num">库龄（天）</th><th>追溯</th></tr></thead>
+      <tbody id="batchbody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>生产加工与成品入库 <span class="tag" id="prodTag">当月</span></h3>
+    <div class="hint">原料批次 → 生产批次 → 成品入库 · 领用与扣减关系由月库存守恒约束锁定（质检门禁） · 点击批次号可跳到下方追溯</div>
+    <div class="pstats" id="prodStats"></div>
+    <table>
+      <thead><tr><th>生产批次</th><th>SKU</th><th class="num">生产日</th><th class="num">投入原料（粒）</th><th class="num">合格产出（盒）</th><th class="num">不合格（盒）</th><th class="num">损耗率</th><th>BOM</th><th class="num">果子领用</th><th class="num">包材领用</th><th class="num">成品入库</th></tr></thead>
+      <tbody id="prodBody"></tbody>
+    </table>
+    <div class="hint" style="margin-top:6px" id="prodHint"></div>
+  </div>
+
+  <div class="card" id="traceCard">
+    <h3>批次追溯链（ERP 出库 → 生产 → 原料）</h3>
+    <div class="hint">输入 ERP 发运单号 + SKU，或直接输生产批次号 · 未关联行如实标注「无法追溯」，不虚构关联 · ERP 为权威源只读比对</div>
+    <div class="tracebar">
+      <input class="ti" id="tShip" placeholder="ERP 发运单号，如 ERP-20260108-001138">
+      <input style="min-width:90px" id="tSku" placeholder="SKU，如 J22-22">
+      <span style="color:var(--muted);font-size:11px">或</span>
+      <input class="ti" id="tBatch" placeholder="生产批次号，如 PB-2601-00033">
+      <button class="mini" id="tGo">追溯</button>
+      <button class="mini" id="tExOk">示例：已关联</button>
+      <button class="mini" id="tExNa">示例：未关联</button>
+    </div>
+    <div id="traceOut"><div class="cmp-empty">输入上方任一组合后点「追溯」—— 将展示 原料批次（含果萃船次/ETA/实到）→ 原料与包材领用 → 成品入库 → 该批次的 ERP 出库行</div></div>
+  </div>
+
+  <div class="card" id="fcCard">
+    <h3>包材采购预测与缺料预警 <span class="tag est">参数为 MOCK 设定</span></h3>
+    <div class="hint" id="fcHint">按未来生产需求（近 3 月 ERP 出库均值 × Y25 同期季节系数）× BOM 用量推导，不是按历史采购量 · ERP Sell-in 口径，非 POS Sell-out</div>
+    <div class="fsum" id="fcSum"></div>
+    <table>
+      <thead><tr><th>包材</th><th class="num">适用 SKU</th><th class="num">11 月需求</th><th class="num">12 月需求</th><th class="num">当前库存</th><th class="num">在途</th><th class="num">安全库存</th><th class="num">净需求</th><th class="num">建议采购</th><th>下单建议</th><th>风险</th></tr></thead>
+      <tbody id="fcBody"></tbody>
+    </table>
+    <div class="hint" style="margin-top:6px">建议采购量 = max(0, 需求(含损耗) + 安全库存 − 库存 − 在途)，按整包装向上取整并满足 MOQ · 点击行展开计算依据 · 建议下单日 = 首个需求月 1 号 − 采购周期</div>
+  </div>
+
+  <div class="card">
+    <h3>本页不提供的指标</h3>
+    <div class="hint">没有数据支撑的指标不做，避免口径错位与编造</div>
+    <div class="na-list" id="notProvided"></div>
+  </div>
+
+  <footer><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a> · 数据来自 /api/sc/*（只读，13 个接口）· supply_chain_v1.db 固定种子 20261109（MOCK_SUPPLY_CHAIN）· 口径见 docs/supply_chain_p5_design.md</footer>
+</div>
+
+<script>
+/* =====================================================================
+ * sc.js（内联）— 供应链看板 P5
+ * 所有指标由后端 /api/sc/* 按 docs/supply_chain_p5_design.md §2 口径算好，
+ * 前端只做展示与交互，不重算任何指标；月份切换时整页重取。
+ * ===================================================================== */
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function txt(x,y,s,fill,size,anchor,wt){const t=el('text',{x,y,fill,'font-size':size||10,'text-anchor':anchor||'start'},svg);if(wt)t.setAttribute('font-weight',wt);t.textContent=s}
+const $=(id)=>document.getElementById(id);
+const fmt=n=>Number(n||0).toLocaleString('zh-CN');
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let svg;
+
+const state={month:'2026-10',summary:null,trend:null,arrival:null,aging:null,
+             warehouses:null,packaging:null,capacity:null,specBom:null,batches:null};
+
+function fail(msg){$('err').style.display='block';$('err').textContent=msg;}
+async function get(path){
+  const r=await fetch(path);
+  const j=await r.json().catch(()=>({ok:false,error:'响应不是 JSON'}));
+  if(!r.ok||!j.ok) throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+
+/* ---- 月份选择器 ---- */
+(function(){
+  const sel=$('f-month');
+  for(let i=1;i<=10;i++){
+    const m='2026-'+String(i).padStart(2,'0');
+    const o=document.createElement('option');o.value=m;o.textContent=m+' 月末';
+    if(m==='2026-10')o.selected=true;sel.appendChild(o);
+  }
+  sel.addEventListener('change',()=>{state.month=sel.value;loadMonth();});
+})();
+
+/* ---- KPI ---- */
+function renderKpis(s){
+  const mom=(v)=>v==null?'<span class="d">—</span>':
+    `<span class="d ${v>0?'up':'down'}">${v>0?'+':''}${v}%</span>`;
+  const cards=[
+    {lbl:'成品库存',val:fmt(s.fg_ending_boxes),unit:'盒',
+     foot:()=>`环比 ${mom(s.fg_mom_pct)}<br>月末快照`,cls:''},
+    {lbl:'原料库存',val:fmt(s.fruit_ending_pieces),unit:'粒',
+     foot:()=>`环比 ${mom(s.fruit_mom_pct)}<br>${s.fruit_batches_in_stock} 批在库`,cls:''},
+    {lbl:'包材库存',val:fmt(s.pm_ending_units),unit:'件',
+     foot:()=>`环比 ${mom(s.pm_mom_pct)}<br>8 种配件`,cls:''},
+    {lbl:'包材金额',val:'¥'+(s.pm_amount_est/1e4).toFixed(1),unit:'万',
+     foot:()=>`<span class="tag est">估算</span>最近 PO 单价<br>果子无采购价`,cls:''},
+    {lbl:'可支撑天数',val:(s.days_of_cover.fg==null?'—':s.days_of_cover.fg.toFixed(1)),unit:'天',
+     foot:()=>`成品口径<br>原料 ${s.days_of_cover.fruit==null?'—':s.days_of_cover.fruit.toFixed(1)} · 包材 ${s.days_of_cover.packaging==null?'—':s.days_of_cover.packaging.toFixed(1)}`,cls:''},
+    {lbl:'到货准班率',val:(s.arrival.on_time_rate_pct==null?'—':s.arrival.on_time_rate_pct.toFixed(1)),unit:'%',
+     foot:()=>`果萃 ${s.arrival.arrived_batches} 批 · 延误 ${s.arrival.delayed_batches}<br>在途未到期不计分母`,cls:'arrive'},
+  ];
+  $('kpis').innerHTML=cards.map(c=>`
+    <div class="kpi ${c.cls}"><div class="lbl">${c.lbl}</div>
+    <div class="val">${c.val}<span class="unit">${c.unit}</span></div>
+    <div class="foot">${c.foot()}</div></div>`).join('');
+}
+
+/* ---- 趋势图：双柱 + 折线（数据 /api/sc/trend，fg 层） ---- */
+function renderTrend(t){
+  const holder=$('trend');holder.innerHTML='';
+  const months=t.months.map(m=>Number(m.slice(5))+'月');
+  const fin=t.fg.map(r=>r?r.in:0), fout=t.fg.map(r=>r?r.out:0), fend=t.fg.map(r=>r?r.ending:0);
+  const W=1100,H=230,L=62,R=56,T=14,B=30;
+  svg=el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%'});holder.appendChild(svg);
+  const iW=W-L-R,n=months.length,maxIn=Math.max(...fin),maxEnd=Math.max(...fend);
+  const yIn=v=>T+(1-v/maxIn)*(H-T-B), yEnd=v=>T+(1-v/maxEnd)*(H-T-B);
+  for(let g=0;g<=4;g++){const y=T+g*(H-T-B)/4;el('line',{x1:L,y1:y,x2:W-R,y2:y,stroke:'#e9eff7'},svg);
+    txt(L-8,y+3,(maxIn*(1-g/4)/1e4).toFixed(0)+'万','#8697ae',10,'end');
+    txt(W-R+8,y+3,(maxEnd*(1-g/4)/1e4).toFixed(0)+'万','#c99a3d',10,'start');}
+  const slot=iW/n;
+  const pts=fend.map((v,j)=>`${L+slot*j+slot/2-8},${yEnd(v)}`).join(' ');
+  months.forEach((m,i)=>{
+    const x=L+slot*i+slot/2;
+    el('rect',{x:x-17,y:yIn(fin[i]),width:15,height:H-B-yIn(fin[i]),fill:'#2f6fe4',rx:3},svg);
+    el('rect',{x:x+2,y:yIn(fout[i]),width:15,height:H-B-yIn(fout[i]),fill:'#0e9f8a',rx:3},svg);
+    el('polyline',{points:pts,fill:'none',stroke:'#e8a33d','stroke-width':2.5},svg);
+    const cx=x-8;
+    el('circle',{cx,cy:yEnd(fend[i]),r:3.5,fill:'#fff',stroke:'#e8a33d','stroke-width':2},svg);
+    txt(x,H-10,m,'#41546f',10.5,'middle');
+  });
+  el('text',{x:W-R+8,y:T+3,fill:'#c99a3d','font-size':10},svg).textContent='期末';
+  el('text',{x:L-8,y:T+3,fill:'#8697ae','font-size':10,'text-anchor':'end'},svg).textContent='出入库';
+}
+
+/* ---- 果萃到货节奏 ---- */
+function renderArrival(a){
+  $('arrHint').textContent=`柱=当月到货量（粒，左轴）· 点=批次数（右轴）· 累计 ${a.arrived_batches} 批 · 延误 ${a.delayed_batches} 批`;
+  const holder=$('arrival');holder.innerHTML='';
+  const months=a.monthly.map(r=>Number(r.month.slice(5))+'月');
+  const qty=a.monthly.map(r=>r.received), batches=a.monthly.map(r=>r.batches);
+  const W=520,H=210,L=56,R=40,T=14,B=28;
+  svg=el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%'});holder.appendChild(svg);
+  const iW=W-L-R,n=months.length,maxQ=Math.max(...qty),maxB=Math.max(...batches);
+  const yQ=v=>T+(1-v/maxQ)*(H-T-B), yB=v=>T+(1-v/maxB)*(H-T-B)*0.85;
+  for(let g=0;g<=3;g++){const y=T+g*(H-T-B)/3;el('line',{x1:L,y1:y,x2:W-R,y2:y,stroke:'#e9eff7'},svg);
+    txt(L-6,y+3,(maxQ*(1-g/3)/1e4).toFixed(0)+'万','#8697ae',9.5,'end');}
+  const slot=iW/n;
+  months.forEach((m,i)=>{
+    const x=L+slot*i+slot/2;
+    el('rect',{x:x-13,y:yQ(qty[i]),width:26,height:H-B-yQ(qty[i]),fill:'#2f6fe4',rx:3},svg);
+    el('circle',{cx:x,cy:yB(batches[i]),r:3.5,fill:'#fff',stroke:'#eda33c','stroke-width':2},svg);
+    txt(x,H-8,m,'#41546f',10,'middle');
+  });
+  const bp=batches.map((b,j)=>`${L+slot*j+slot/2},${yB(b)}`).join(' ');
+  el('polyline',{points:bp,fill:'none',stroke:'#eda33c','stroke-width':1.8,'stroke-dasharray':'4 3'},svg);
+  el('text',{x:W-R+6,y:T+4,fill:'#eda33c','font-size':9.5},svg).textContent='批次';
+  const d=a.delayed_top[0];
+  $('delayHint').innerHTML=d?
+    `延误样例：${esc(d.batch_id)}（${esc(d.raw_material_id)}）ETA ${d.eta_date} → 实到 ${d.arrival_date}，<b style="color:#e5484d">延 ${d.delay_days} 天</b> · 最长延误 ${a.max_delay_days} 天`:
+    '无延误批次';
+}
+
+/* ---- 库龄图 ---- */
+function renderAging(g,end){
+  $('agingHint').textContent=`以 ${end} 为观察点，按到港日计算 · 空桶如实显示 0 批`;
+  const holder=$('aging');holder.innerHTML='';
+  const rows=g.buckets.map(b=>({k:b.bucket.replace('<','< ').replace('30-60','30–60').replace('60-90','60–90').replace('< ','<')+' 天',b:b.batches,q:b.pieces}));
+  const W=520,H=180,L=70,T=8,B=26;
+  svg=el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%'});holder.appendChild(svg);
+  const maxQ=Math.max(...rows.map(r=>r.q))||1, cw=(W-L-10)/rows.length;
+  rows.forEach((r,i)=>{
+    const x=L+cw*i+cw/2, h=r.q/maxQ*(H-T-B);
+    el('rect',{x:x-30,y:H-B-h,width:60,height:h,fill:i<2?'#2f6fe4':'#dbe6f7',rx:4},svg);
+    if(r.q>0){const lab=r.q<10000?fmt(r.q)+' 粒':(r.q/1e4).toFixed(0)+'万粒';
+      el('text',{x,y:H-B-h-8,fill:'#16233a','font-size':11,'text-anchor':'middle','font-weight':700},svg).textContent=lab;}
+    else{el('text',{x,y:H-B-14,fill:'#8697ae','font-size':10,'text-anchor':'middle'},svg).textContent='0 批';}
+    el('text',{x,y:H-8,fill:'#41546f','font-size':10.5,'text-anchor':'middle'},svg).textContent=r.k;
+    el('text',{x,y:H-B-h+(r.q>0?h/2+4:0),fill:'#fff','font-size':10,'text-anchor':'middle','font-weight':700},svg).textContent=r.q>0?r.b+' 批':'';
+  });
+  const o=g.oldest;
+  $('oldestHint').innerHTML=o?
+    `最老批次：${esc(o.batch_id)}（${esc(o.raw_material_id)}）${o.age_days} 天 · 仅原料有批次，包材/成品不提供库龄`:'';
+}
+
+/* ---- 仓库分布 ---- */
+function renderWarehouses(w){
+  const holder=$('wh');holder.innerHTML='';
+  const color={原料:'#0e9f8a',包材:'#7c63d6',成品:'#2f6fe4'};
+  const order={原料:0,包材:1,成品:2};
+  const rows=w.rows.slice().sort((a,b)=>(order[a.layer]-order[b.layer])||a.warehouse_id.localeCompare(b.warehouse_id));
+  $('whHint').textContent=`月末 · 三层（原料 / 包材 / 成品）共 ${w.warehouses_total} 仓 · 单位各层不同（粒/件/盒），不相加`;
+  const W=660,rowsH=24;
+  svg=el('svg',{viewBox:`0 0 ${W} ${rows.length*rowsH+8}`,width:'100%'});holder.appendChild(svg);
+  const maxQ=Math.max(...rows.map(r=>r.ending_qty)), bx=250, bw=W-354;
+  rows.forEach((r,i)=>{
+    const y=i*rowsH+8;
+    el('text',{x:0,y:y+12,fill:'#41546f','font-size':11},svg).textContent=esc(r.warehouse_id+' '+r.warehouse_name);
+    el('rect',{x:bx,y:y+2,width:bw,height:11,fill:'#eef3fb',rx:3},svg);
+    el('rect',{x:bx,y:y+2,width:Math.max(r.ending_qty/maxQ*bw,2),height:11,fill:color[r.layer],rx:3},svg);
+    el('text',{x:bx+bw+8,y:y+12,fill:'#16233a','font-size':11,'font-weight':700},svg).textContent=fmt(r.ending_qty);
+    el('text',{x:bx+bw+72,y:y+12,fill:'#8697ae','font-size':10},svg).textContent=r.unit;
+  });
+}
+
+/* ---- SKU 可支撑能力：全量列表 + 多选对比（数据 /api/sc/capacity） ---- */
+const MAXPICK=4;
+let PICK=new Set(['SKU-001','SKU-002','SKU-003']), FILTER='all', Q='', ASC=true;
+const FNAME={'R':'品类C','G':'品类B','J':'品类A'};
+const fruitLabel=rm=>{const m=/^RM-([RGJ])(\d+)$/.exec(rm);return m?FNAME[m[1]]+' '+m[2]+'#':rm;};
+
+function pmStock(){const p=state.capacity.packaging_available||{};
+  return {BOX:p['PM-BOX']||0,TRAY:p['PM-TRAY']||0,NET:p['PM-NET']||0};}
+function bomItems(it){                      // 4 项主材：果子 / 包装盒 / 内托(2 粒装不使用) / 网套
+  const pm=pmStock();
+  const a=[{n:fruitLabel(it.fruit_raw_id),q:it.pieces_per_box,st:it.fruit_available}];
+  a.push({n:'包装盒',q:1,st:pm.BOX});
+  if(it.pieces_per_box!==2) a.push({n:'内托',q:1,st:pm.TRAY});
+  a.push({n:'网套',q:it.pieces_per_box,st:pm.NET});
+  return a;
+}
+const capCls=c=>c<20000?'low':c<60000?'mid':'high';
+
+function rowsView(){
+  const v=state.capacity.items.filter(r=>(FILTER==='all'||r.category===FILTER)&&
+    (!Q||(r.sku_code+' '+r.sku_name).toLowerCase().includes(Q)));
+  return v.sort((a,b)=>ASC?a.cap_boxes-b.cap_boxes:b.cap_boxes-a.cap_boxes);
+}
+function renderTable(){
+  const v=rowsView();
+  $('bomRows').innerHTML=v.map(r=>{
+    const on=PICK.has(r.sku_code);
+    return `<tr data-c="${r.sku_code}" class="${on?'pick':''}">
+      <td><input type="checkbox" ${on?'checked':''}></td>
+      <td class="sk">${r.sku_code}</td><td>${r.category}</td><td class="num">${r.pieces_per_box}</td>
+      <td class="num">${fmt(r.fruit_available)}</td>
+      <td class="num cap ${capCls(r.cap_boxes)}">${fmt(r.cap_boxes)}</td>
+      <td class="bnm">${esc(r.bottleneck)}</td>
+      <td class="num">${r.packaging_cost_est==null?'—':'¥'+r.packaging_cost_est.toFixed(2)}</td></tr>`;
+  }).join('');
+  const names=[...PICK].join('、');
+  const total=state.capacity.total;
+  $('bomCount').textContent=
+    `显示 ${v.length} / ${total} 个 SKU（表格内可滚动）· 已选 ${PICK.size} 个`+
+    (PICK.size?`：${names}`:'')+`（最多 ${MAXPICK}）`+
+    (PICK.size>=MAXPICK?' · 已达上限，先取消勾选再加':'');
+  renderCmp();
+}
+function renderCmp(){
+  const holder=$('bomCompare');
+  const byCode=Object.fromEntries(state.capacity.items.map(i=>[i.sku_code,i]));
+  const picked=[...PICK].map(c=>byCode[c]).filter(Boolean);
+  if(!picked.length){
+    holder.innerHTML='<div class="cmp-empty">勾选表格左侧任意 2–4 个 SKU，这里并排显示各自的可支撑盒数与 4 项主材用量 —— 用来比「同果径不同粒装」或「同粒装不同果径」哪个更能做</div>';
+    return;
+  }
+  const cols=picked.map(r=>{
+    const trs=bomItems(r).map(it=>{
+      const cap=Math.floor(it.st/it.q);
+      const isBn=cap===r.cap_boxes;
+      return `<tr class="${isBn?'bn':''}"><td>${it.n}</td><td class="num">x${it.q}</td><td class="num">${fmt(cap)}</td></tr>`;
+    }).join('');
+    return `<div class="cmp-col">
+      <button class="x" data-del="${r.sku_code}" title="移除">✕</button>
+      <div class="h"><span>${r.sku_code}</span></div>
+      <div class="big">${fmt(r.cap_boxes)}<span>盒</span></div>
+      <div class="meta">${esc(r.sku_name)} · 果子可用 ${fmt(r.fruit_available)} 粒</div>
+      <table><thead><tr><th>主材</th><th class="num">用量</th><th class="num">可支撑</th></tr></thead>
+      <tbody>${trs}</tbody></table>
+      <div class="meta" style="margin:6px 0 0">单盒包材 ${r.packaging_cost_est==null?'—':'¥'+r.packaging_cost_est.toFixed(2)}（估算）</div>
+    </div>`;
+  }).join('');
+  const s=picked.slice().sort((a,b)=>a.cap_boxes-b.cap_boxes);
+  const lo=s[0], hi=s[s.length-1];
+  let note=`已选 ${picked.length} 个 SKU：最受限 <b>${lo.sku_code}（${esc(lo.sku_name)}）仅 ${fmt(lo.cap_boxes)} 盒</b>`;
+  if(picked.length>1) note+=`，最宽松 <b>${hi.sku_code} ${fmt(hi.cap_boxes)} 盒</b>，相差 ${(hi.cap_boxes/lo.cap_boxes).toFixed(1)} 倍`;
+  const bnSet=[...new Set(picked.map(r=>r.bottleneck))].join('、');
+  note+=`；瓶颈为 ${bnSet} —— <b>要放大产量必须先补瓶颈主材</b>。`;
+  holder.innerHTML=`<div class="cmp">${cols}</div><div class="cmp-note">${note}</div>`;
+}
+function toggle(c){
+  if(PICK.has(c)) PICK.delete(c);
+  else { if(PICK.size>=MAXPICK) return; PICK.add(c); }
+  renderTable();
+}
+$('bomRows').addEventListener('click',e=>{
+  const tr=e.target.closest('tr[data-c]'); if(!tr) return;
+  toggle(tr.getAttribute('data-c'));
+});
+$('bomCompare').addEventListener('click',e=>{
+  const b=e.target.closest('[data-del]'); if(!b) return;
+  PICK.delete(b.getAttribute('data-del')); renderTable();
+});
+$('bomSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-k]'); if(!b) return;
+  FILTER=b.getAttribute('data-k');
+  [...document.querySelectorAll('#bomSeg button')].forEach(x=>x.classList.toggle('on',x===b));
+  renderTable();
+});
+$('bomQ').addEventListener('input',e=>{Q=e.target.value.trim().toLowerCase();renderTable();});
+$('bomSort').addEventListener('click',e=>{ASC=!ASC;e.target.textContent='排序：可支撑 '+(ASC?'↑':'↓');renderTable();});
+$('bomClear').addEventListener('click',()=>{PICK.clear();renderTable();});
+
+function renderCapacity(cap){
+  const byCat={};cap.items.forEach(i=>{byCat[i.category]=(byCat[i.category]||0)+1;});
+  [...document.querySelectorAll('#bomSeg button')].forEach(b=>{
+    const k=b.getAttribute('data-k');
+    b.textContent=(k==='all'?`全部 ${cap.total}`:`${k} ${byCat[k]||0}`);
+  });
+  const caps=cap.items.map(i=>i.cap_boxes);
+  const bnAll=cap.items.every(i=>i.bottleneck==='果子');
+  const pmTotal=state.summary?state.summary.pm_ending_units:null;
+  $('bomSum').innerHTML=
+    `<span>总包材库存 <b>${pmTotal==null?'—':fmt(pmTotal)} 件</b>（8 种配件）</span>`+
+    `<span>可支撑区间 <b>${fmt(Math.min(...caps))} ~ ${fmt(Math.max(...caps))} 盒</b></span>`+
+    `<span>${cap.total} 个 SKU 的瓶颈 <b>${bnAll?'全部为果子':(cap.items[0].bottleneck+' 等')}</b></span>`;
+  renderTable();
+}
+
+/* ---- 规格 × 用量表 ---- */
+function renderSpecs(b){
+  $('speclist').innerHTML=b.specs.map(s=>
+    `<tr><td style="font-weight:700;color:#16233a">${s.pieces_per_box} 粒装</td>
+     <td class="num">${s.sku_count}</td><td class="num">${s.pieces_per_box}</td>
+     <td class="num">${s.box_qty}</td>
+     <td class="num">${s.tray_qty?s.tray_qty:'<span class="tag">不使用</span>'}</td>
+     <td class="num">${s.net_qty}</td>
+     <td class="num">${s.packaging_cost_est==null?'—':'¥'+s.packaging_cost_est.toFixed(2)}</td>
+     <td class="num" style="font-weight:700;color:${s.packaging_bottleneck==='网套'?'#b26a00':'#10a06a'}">${fmt(s.packaging_cap_boxes)}</td></tr>`).join('');
+}
+
+/* ---- 包材配件成本表 ---- */
+function renderPackaging(p){
+  const name={ 'PM-BOX':'彩印礼盒','PM-NET':'发泡网套','PM-TRAY':'塑料内托','PM-CARTON':'五层瓦楞外箱',
+    'PM-LABEL':'追溯标签','PM-TAPE':'打包胶带','PM-PAD':'缓冲果垫','PM-SEAL':'封箱贴'};
+  $('pmbody').innerHTML=p.materials.map(m=>`
+    <tr><td style="font-weight:600;color:#16233a">${m.material_id} ${name[m.material_id]||esc(m.material_name)}</td>
+    <td class="num">${m.latest_price==null?'—':'¥'+m.latest_price.toFixed(2)}</td>
+    <td class="num">${fmt(m.ending_qty)}</td>
+    <td>${esc(m.unit)}</td>
+    <td class="num" style="font-weight:700;color:#16233a">${m.amount_est==null?'—':'¥'+fmt(m.amount_est)}</td></tr>`).join('')+
+    `<tr class="total"><td>合计</td><td class="num">—</td>
+     <td class="num">${fmt(p.total.ending_units)}</td><td>件</td>
+     <td class="num">¥${fmt(p.total.amount_est)}</td></tr>`;
+  // 供应商
+  $('supbody').innerHTML=p.suppliers.map(s=>{
+    const rate=s.on_time_rate_pct==null?'—':s.on_time_rate_pct.toFixed(1)+'%';
+    const pctv=s.on_time_rate_pct==null?0:s.on_time_rate_pct;
+    return `<tr><td style="font-weight:600;color:#16233a">${esc(s.supplier_name)}</td>
+      <td class="num">${s.arrived_pos}</td><td class="num">${s.on_time_pos}</td><td class="num">${s.in_transit_pos}</td>
+      <td><div class="barcell"><i class="ok" style="width:${pctv}%"></i></div>
+      <div style="font-size:10.5px;color:#41546f;margin-top:2px">${rate}</div></td></tr>`;
+  }).join('');
+  // 在途
+  $('itHint').textContent=`${p.in_transit_pos.length} 张 PO 已下单未到货 · 在途未到期 ≠ 延迟 · 展示前 5 张`;
+  $('itbody').innerHTML=p.in_transit_pos.slice(0,5).map(r=>`
+    <tr><td>${r.po_id}</td><td>${r.material_id} ${name[r.material_id]||''}</td>
+    <td class="num">${fmt(r.purchase_qty)}</td><td class="num">${r.expected_arrival_date}</td>
+    <td><span class="tag">在途</span></td></tr>`).join('');
+}
+
+/* ---- 批次明细 ---- */
+function renderBatches(b){
+  $('batchbody').innerHTML=b.rows.slice(0,10).map(r=>{
+    const late=r.arrival_date>r.eta_date;
+    const age=r.age_days<30?`<span style="color:#10a06a;font-weight:700">${r.age_days} 天</span>`
+                           :`<span style="color:#eda33c;font-weight:700">${r.age_days} 天</span>`;
+    return `<tr><td style="font-weight:600;color:#16233a">${r.batch_id}</td>
+    <td>${esc(r.raw_label)}</td><td>${r.warehouse_id}</td><td>${r.shipment_no}</td>
+    <td class="num">${r.eta_date}</td>
+    <td class="num">${late?`<span style="color:#e5484d">${r.arrival_date}</span>`:r.arrival_date}</td>
+    <td class="num" style="font-weight:700;color:#16233a">${fmt(r.ending_qty)}</td>
+    <td class="num">${age}</td><td><span class="tag">原料层</span></td></tr>`;
+  }).join('');
+}
+
+/* ---- 不提供的指标 ---- */
+function renderNotProvided(meta){
+  $('notProvided').innerHTML=(meta.not_provided||[]).map(n=>
+    `<div><b>${esc(n.metric)}</b>：${esc(n.reason)}</div>`).join('');
+}
+
+/* ---- V2：生产加工与成品入库 ---- */
+function renderProduction(p){
+  const o=p.overview;
+  $('prodTag').textContent=state.month+' 当月';
+  const st=[
+    {lbl:'生产批次',v:fmt(o.batches),u:'批'},
+    {lbl:'投入原料',v:fmt(o.input_fruit_pieces),u:'粒'},
+    {lbl:'合格产出',v:fmt(o.qualified_boxes),u:'盒'},
+    {lbl:'不合格产出',v:fmt(o.unqualified_boxes),u:'盒'},
+    {lbl:'平均损耗率',v:o.avg_loss_rate_pct.toFixed(2),u:'%'},
+  ];
+  $('prodStats').innerHTML=st.map(s=>`<div class="pstat"><div class="lbl">${s.lbl}</div><div class="v">${s.v}<span class="u">${s.u}</span></div></div>`).join('');
+  $('prodBody').innerHTML=p.batches.map(r=>`
+    <tr class="linkbatch" data-b="${r.batch_id}">
+      <td class="sk" style="color:var(--brand)">${r.batch_id}</td>
+      <td>${r.sku_code}</td><td class="num">${r.production_date}</td>
+      <td class="num">${fmt(r.input_fruit_qty)}</td>
+      <td class="num" style="font-weight:700">${fmt(r.qualified_output_qty)}</td>
+      <td class="num">${fmt(r.unqualified_output_qty)}</td>
+      <td class="num">${r.loss_rate_pct}%</td>
+      <td><span class="tag">${r.bom_version}</span></td>
+      <td class="num">${fmt(r.fruit_issue_qty)} 粒 / ${r.fruit_issue_batches} 批</td>
+      <td class="num">${r.packaging_issue_lines} 项</td>
+      <td class="num">${fmt(r.fg_inbound_qty)}<br><span style="color:var(--muted);font-size:10px">${r.fg_inbound_date||'—'}</span></td></tr>`).join('');
+  const t=p.trend, last=t[t.length-1];
+  $('prodHint').innerHTML=`月度趋势（10 个月）：${t.map(r=>`${r.month.slice(5)}月 ${fmt(r.qualified_boxes)} 盒`).join(' · ')}<br>当月显示前 ${p.batches.length} 批（${p.limit} 上限，完整走 /api/sc/production） · 投入 =（合格+不合格）× 粒数 ×（1+损耗率）`;
+}
+$('prodBody').addEventListener('click',e=>{
+  const tr=e.target.closest('tr[data-b]'); if(!tr) return;
+  $('tShip').value=''; $('tSku').value='';
+  $('tBatch').value=tr.getAttribute('data-b');
+  runTrace();
+  $('traceCard').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* ---- V2：批次追溯 ---- */
+async function runTrace(){
+  const out=$('traceOut');
+  const batch=($('tBatch').value||'').trim();
+  const ship=($('tShip').value||'').trim();
+  const sku=($('tSku').value||'').trim();
+  if(!batch && !(ship&&sku)){ out.innerHTML='<div class="cmp-empty" style="border-color:#f2c4c4;color:#8f2323">请输入生产批次号，或（发运单号 + SKU）组合</div>'; return; }
+  out.innerHTML='<div style="color:var(--muted);font-size:12px;padding:6px 0">追溯中 …</div>';
+  let j;
+  try{
+    const q= batch ? `batch_id=${encodeURIComponent(batch)}` : `shipment_no=${encodeURIComponent(ship)}&sku_code=${encodeURIComponent(sku)}`;
+    j=await get('/api/sc/trace?'+q);
+  }catch(e){ out.innerHTML=`<div class="cmp-empty" style="border-color:#f2c4c4;color:#8f2323">追溯失败：${esc(e.message)}</div>`; return; }
+  const d=j.data;
+  const rTag=s=>s==='MATCHED'?'<span class="tag">已关联</span>':`<span class="tag r-mid">${s==='NO_EARLIER_BATCH'?'无更早批次':'无生产数据'}</span>`;
+  if(!d.production_batch){
+    out.innerHTML=`<div class="tracechain">${rTag(d.match_status)} <span class="tn">ERP ${esc(d.shipment_no)}</span><span class="ar">→</span><span class="tn" style="background:#fff4e3;color:#b26a00">生产批次：无法追溯</span></div>
+    <div class="cmp-note">${esc(d.note||'')} · 匹配依据：${esc(d.match_basis||'—')}</div>`;
+    return;
+  }
+  const pb=d.production_batch;
+  const fi=d.fruit_issues, pi=d.packaging_issues, fg=d.fg_inbound, es=d.erp_shipments;
+  out.innerHTML=`
+    <div class="tracechain">
+      <span class="tn">ERP 出库 ${d.direction==='erp_to_batch'?esc(d.shipment_no)+' · '+esc(d.sku_code)+' · '+fmt(d.sales_boxes)+' 盒':'（正向查询）'}</span>
+      <span class="ar">→</span>${rTag(d.match_status)}
+      <span class="ar">→</span><span class="tn">生产批次 ${esc(pb.batch_id)}</span>
+      <span class="ar">→</span><span class="tn">成品入库 ${fmt(fg.reduce((s,r)=>s+r.qty,0))} 盒</span>
+      <span class="ar">→</span><span class="tn">原料 ${fi.length} 批 / 包材 ${pi.length} 项</span>
+    </div>
+    <table style="margin-bottom:8px">
+      <thead><tr><th>生产批次</th><th>SKU</th><th class="num">生产日</th><th class="num">投入（粒）</th><th class="num">合格（盒）</th><th class="num">不合格（盒）</th><th class="num">损耗率</th><th>工单 / BOM</th><th>计划月</th></tr></thead>
+      <tbody><tr><td class="sk">${esc(pb.batch_id)}</td><td>${esc(pb.sku_code)}</td><td class="num">${pb.production_date}</td>
+        <td class="num">${fmt(pb.input_fruit_qty)}</td><td class="num">${fmt(pb.qualified_output_qty)}</td>
+        <td class="num">${fmt(pb.unqualified_output_qty)}</td><td class="num">${pb.loss_rate_pct}%</td>
+        <td>${esc(pb.wo_id)} · <span class="tag">${esc(pb.bom_version)}</span></td><td>${esc(pb.plan_month||'—')}</td></tr></tbody>
+    </table>
+    <div class="grid2" style="gap:10px">
+      <div>
+        <h3 style="font-size:12px;margin-bottom:4px">原料领用（果萃到货批次）</h3>
+        <table><thead><tr><th>原料批次</th><th>原料</th><th>船次号</th><th class="num">ETA</th><th class="num">实到</th><th class="num">领用（粒）</th><th>质检</th></tr></thead>
+        <tbody>${fi.map(r=>`<tr><td class="sk">${esc(r.fruit_batch_id)}</td><td>${esc(r.raw_material_id)}</td><td>${esc(r.zspri_shipment_no)}</td>
+          <td class="num">${r.eta_date}</td><td class="num">${r.arrival_date}</td><td class="num">${fmt(r.issue_qty)}</td><td>${esc(r.quality_grade)}</td></tr>`).join('')}</tbody></table>
+      </div>
+      <div>
+        <h3 style="font-size:12px;margin-bottom:4px">包材领用 / 成品入库 / ERP 出库</h3>
+        <table><thead><tr><th>包材</th><th class="num">领用量</th><th>入库仓</th><th class="num">入库量（盒）</th></tr></thead>
+        <tbody>${pi.slice(0,4).map((r,i)=>`<tr><td>${esc(r.material_name)}</td><td class="num">${fmt(r.issue_qty)}</td>
+          <td>${fg[i]?esc(fg[i].warehouse_id):'—'}</td><td class="num">${fg[i]?fmt(fg[i].qty):'—'}</td></tr>`).join('')}</tbody></table>
+        ${es.length?`<div class="hint" style="margin-top:6px">关联 ERP 出库 ${es.length} 行，如 ${es.slice(0,3).map(r=>esc(r.shipment_no)+'（'+fmt(r.sales_boxes)+' 盒）').join('、')}${es.length>3?' …':''} · 匹配口径：入库日 ≤ 出库日的最近生产批次</div>`
+        :'<div class="hint" style="margin-top:6px">该批次无关联 ERP 出库行（出库晚于数据窗或走其他批次）</div>'}
+      </div>
+    </div>`;
+}
+$('tGo').addEventListener('click',runTrace);
+$('tExOk').addEventListener('click',()=>{$('tBatch').value='';$('tShip').value='ERP-20260108-001138';$('tSku').value='J22-22';runTrace();});
+$('tExNa').addEventListener('click',()=>{$('tBatch').value='';$('tShip').value='ERP-20250101-000180';$('tSku').value='G18-18';runTrace();});
+[['tShip',13],['tSku',13],['tBatch',13]].forEach(([id,n])=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')runTrace();}));
+
+/* ---- V2：包材采购预测 ---- */
+const PMNAME={'PM-BOX':'彩印礼盒','PM-NET':'发泡网套','PM-TRAY':'塑料内托','PM-CARTON':'五层瓦楞外箱',
+  'PM-LABEL':'追溯标签','PM-TAPE':'打包胶带','PM-PAD':'缓冲果垫','PM-SEAL':'封箱贴'};
+function renderForecast(fc){
+  const riskTag=r=>r==='high'?'<span class="tag r-high">高</span>':r==='medium'?'<span class="tag r-mid">中</span>':'<span class="tag r-low">低</span>';
+  $('fcHint').textContent=`观察点 ${fc.obs_date} 月末 · 预测 ${fc.forecast_months.join(' / ')} · 需求推导：${fc.forecast_basis}`;
+  const fms=fc.forecast_months;
+  $('fcSum').innerHTML=
+    `<span>预测生产 <b>${fms.map(m=>m.slice(5)+'月 '+fmt(fc.forecast_boxes[m])+' 盒').join(' / ')}</b></span>`+
+    `<span>共 ${fc.items.length} 种包材</span>`+
+    `<span>需求来源 fact_production_forecast（<b>ERP Sell-in 口径</b>，非 POS Sell-out）</span>`;
+  $('fcBody').innerHTML=fc.items.map(it=>{
+    if(it.param_status!=='active'){
+      return `<tr><td>${esc(it.material_id)} ${PMNAME[it.material_id]||esc(it.material_name)}</td>
+        <td colspan="10"><span class="tag r-mid">参数待配置</span> ${esc(it.note||'')}</td></tr>`;
+    }
+    const dm=it.forecast_demand||{};
+    const d1=dm[fms[0]]||{}, d2=dm[fms[1]]||{};
+    return `<tr data-fc="${esc(it.material_id)}">
+      <td class="sk">${esc(it.material_id)} ${PMNAME[it.material_id]||''}</td>
+      <td class="num">${it.applicable_skus}</td>
+      <td class="num">${fmt(d1.with_attrition)}</td><td class="num">${fmt(d2.with_attrition)}</td>
+      <td class="num">${fmt(it.available_qty)}</td><td class="num">${fmt(it.in_transit_qty)}</td>
+      <td class="num">${fmt(it.safety_stock_qty)}</td>
+      <td class="num" style="font-weight:700;color:${it.net_requirement>0?'#c62f2f':'#0e7a5c'}">${fmt(it.net_requirement)}</td>
+      <td class="num" style="font-weight:800;color:${it.suggested_order_qty>0?'#c62f2f':'#8697ae'}">${it.suggested_order_qty>0?fmt(it.suggested_order_qty):'无需'}</td>
+      <td style="font-size:11px">${esc(it.order_advice)}</td>
+      <td>${riskTag(it.risk_level)}</td></tr>
+      <tr class="exp" style="display:none"><td colspan="11">
+        ${esc(it.basis)}<br>建议金额估算 ¥${fmt((it.suggested_order_amount_cents_est/100).toFixed(0))} · 采购周期 ${it.lead_time_days} 天 · MOQ ${fmt(it.moq_qty)} · 整包装 ${fmt(it.order_package_qty)} · 参数版本 ${esc(it.param_version)}（MOCK）</td></tr>`;
+  }).join('');
+}
+$('fcBody').addEventListener('click',e=>{
+  const tr=e.target.closest('tr[data-fc]'); if(!tr) return;
+  const exp=tr.nextElementSibling;
+  if(exp) exp.style.display=exp.style.display==='none'?'':'none';
+});
+async function loadForecast(){
+  if(state.month!=='2026-10'){
+    $('fcSum').innerHTML=`<span>预测观察点固定为 <b>2026-10 月末</b>（数据窗最后一个月），当前查看 ${state.month}，切回 2026-10 后展示</span>`;
+    $('fcBody').innerHTML='';
+    return;
+  }
+  try{
+    const j=await get(`/api/sc/forecast?month=${state.month}`);
+    renderForecast(j.data);
+  }catch(e){
+    $('fcSum').innerHTML=`<span style="color:#8f2323">预测加载失败：${esc(e.message)}</span>`;
+    $('fcBody').innerHTML='';
+  }
+}
+
+/* ---- 整月加载 ---- */
+async function loadMonth(){
+  $('loading').style.display='block';
+  $('err').style.display='none';
+  const m=state.month;
+  try{
+    const [summary,trend,arrival,aging,warehouses,packaging,capacity,specBom,batches]=
+      await Promise.all([
+        get(`/api/sc/summary?month=${m}`), get(`/api/sc/trend?month=${m}`),
+        get(`/api/sc/arrival?month=${m}`), get(`/api/sc/aging?month=${m}`),
+        get(`/api/sc/warehouses?month=${m}`), get(`/api/sc/packaging?month=${m}`),
+        get(`/api/sc/capacity?month=${m}`), get(`/api/sc/bom?month=${m}`),
+        get(`/api/sc/batches?month=${m}`),
+      ]);
+    state.summary=summary.data; state.trend=trend.data; state.arrival=arrival.data;
+    state.aging=aging.data; state.warehouses=warehouses.data;
+    state.packaging=packaging.data; state.capacity=capacity.data;
+    state.specBom=specBom.data; state.batches=batches.data;
+    renderKpis(summary.data);
+    renderTrend(trend.data);
+    renderArrival(arrival.data);
+    renderAging(aging.data,summary.data.month_end);
+    renderWarehouses(warehouses.data);
+    renderCapacity(capacity.data);
+    renderSpecs(specBom.data);
+    renderPackaging(packaging.data);
+    renderBatches(batches.data);
+    renderNotProvided(capacity.meta);
+    const production=await get(`/api/sc/production?month=${m}`);
+    state.production=production.data;
+    renderProduction(production.data);
+    await loadForecast();
+  }catch(e){
+    fail('加载失败：'+e.message+'（刷新重试；接口清单见 /api/meta）');
+  }finally{
+    $('loading').style.display='none';
+  }
+}
+loadMonth();
+</script>
+<script src="/page-context.js"></script>
+<script src="/agent-dock.js"></script>
+</body>
+</html>

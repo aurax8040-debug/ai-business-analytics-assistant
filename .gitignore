@@ -1,0 +1,28 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- 运行产物 ----
+logs/
+*.log
+.DS_Store
+.playwright-cli/
+
+# ---- SQLite 临时文件 ----
+data/*.db-wal
+data/*.db-shm
+data/*.db-journal
+
+# ---- 本机运行态 ----
+# 服务启动会重写这个文件（客户经理目标配置等演示态），不跟随仓库。
+data/app_config.db
+
+# ---- 密钥（绝对不入库）----
+# .env.example 是模板，可以提交；.env 里有 API Key，永不提交。
+.env
+.env.*
+!.env.example
+*.key

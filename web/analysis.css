@@ -1,0 +1,170 @@
+/* =====================================================================
+   综合经营分析 V2 — 页面专属样式（叠加在 styles.css + nav.css 之上）
+   减法版：四个区域（筛选 / KPI / 趋势+维度分析 / 明细），
+   卡片更少、留白更多，颜色与圆角沿用 styles.css 的企业 BI 变量。
+   本文件只新增页面专属 class，不覆盖 styles.css 的既有规则。
+   ===================================================================== */
+
+/* ------------------------------------------------------------ 维度切换条 */
+.dim-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 7px 12px; margin-bottom: 12px;
+}
+.dim-label { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: .2px; }
+.dim-tabs { display: inline-flex; gap: 3px; background: var(--surface-2);
+            border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+.dim-tabs button {
+  border: 0; background: transparent; color: var(--ink-2);
+  font-size: 11.5px; font-weight: 650; padding: 4px 12px; border-radius: 4px;
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+}
+.dim-tabs button:hover { background: #eaf2ff; color: var(--brand); }
+.dim-tabs button.on { background: var(--brand); color: #fff; box-shadow: 0 1px 4px rgba(47,111,228,.28); }
+.dim-tabs button.on:hover { background: #255fc9; color: #fff; }
+.dim-sys {
+  font-size: 8.5px; font-style: normal; font-weight: 700; letter-spacing: .2px;
+  background: #eef3fb; color: #7b8ea8; border-radius: 3px; padding: 0 3px; line-height: 1.35;
+}
+.dim-tabs button.on .dim-sys { background: rgba(255,255,255,.24); color: #fff; }
+.dim-hint {
+  flex: 1; min-width: 260px; font-size: 10.5px; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dim-hint b { color: var(--brand); font-weight: 700; }
+.dim-hint .warn { color: var(--warn); font-weight: 650; }
+
+/* ------------------------------------------------------------ B 核心 KPI（两张卡） */
+.row-label .pill-tabs.lbl-right { margin-left: auto; }
+.kpi-duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.kpi-duo .kpi-card { padding: 15px 16px 13px; min-height: 0; }
+.kpi-duo .kpi-card.has-icon { display: flex; align-items: flex-start; gap: 12px; }
+.kpi-duo .kpi-top { display: flex; align-items: center; gap: 8px; }
+.kpi-sys {
+  font-size: 11.5px; font-weight: 750; color: var(--ink-2); letter-spacing: .2px;
+}
+.kpi-duo .kpi-mom { margin-left: auto; font-size: 11px; }
+.kpi-duo .kpi-main { margin-top: 6px; align-items: baseline; gap: 10px; }
+.kpi-duo .kpi-value { font-size: 31px; letter-spacing: -.9px; }
+.kpi-caption { font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+.kpi-aux {
+  display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px;
+  padding-top: 7px; border-top: 1px dashed var(--border);
+}
+.kpi-aux span { display: flex; align-items: baseline; gap: 5px; }
+.kpi-aux em { font-style: normal; font-size: 10px; color: var(--muted); }
+.kpi-aux b {
+  font-size: 12px; font-weight: 750; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.kpi-card.sys-pos .kpi-aux b { color: #0b7a68; }
+
+/* ------------------------------------------------------------ C 图表网格 */
+.grid-2.single { grid-template-columns: minmax(0, 1fr); }
+.trend-card { min-height: 236px; }
+.grid-2 .card { min-height: 0; }
+
+/* 图例行：左对齐到绘图区起点、与坐标轴标签拉开距离，
+   否则会和 x 轴月份标签挤成一条难分辨的灰字带 */
+.mini-legend {
+  display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center;
+  gap: 3px 12px; min-height: 14px; margin: 8px 0 0 54px;
+  font-size: 10px; color: var(--ink-2);
+}
+.mini-legend span { white-space: nowrap; }
+.mini-legend i {
+  display: inline-block; width: 7px; height: 7px; border-radius: 2px;
+  margin-right: 3px; vertical-align: middle;
+}
+
+/* 单侧维度：不可用一侧置灰，点击前就能看出「这一侧没有该维度字段」 */
+.pill-tabs button:disabled {
+  color: #b7c3d3; cursor: not-allowed; text-decoration: line-through;
+  text-decoration-color: #cfd8e3;
+}
+.pill-tabs button:disabled.on { background: transparent; color: #b7c3d3; font-weight: 400; box-shadow: none; }
+.card-head .pill-tabs + .pill-tabs { margin-left: 4px; }
+
+/* 整行独享的结构卡：环图 + 结构小表，避免大片空白 */
+.grid-2.single .donut-wrap { justify-content: center; gap: 44px; align-items: center; }
+table.struct-tbl { border-collapse: collapse; min-width: 330px; font-size: 10.5px; }
+table.struct-tbl th {
+  text-align: right; padding: 5px 10px; color: #2a4d84; font-weight: 750;
+  background: linear-gradient(180deg, var(--thead-1), var(--thead-2));
+  border-bottom: 1px solid #c9dcf7; white-space: nowrap;
+}
+table.struct-tbl th:first-child, table.struct-tbl td:first-child { text-align: left; }
+table.struct-tbl td {
+  padding: 5px 10px; border-bottom: 1px solid #eef3fb; color: var(--ink-2);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+table.struct-tbl td:nth-child(n+2) { text-align: right; }
+table.struct-tbl tbody tr:hover td { background: #eaf3ff; }
+
+/* ------------------------------------------------------------ D 明细：搜索 / 排序 */
+.detail-search { display: flex; align-items: center; gap: 6px; }
+.detail-search input {
+  height: 28px; width: 268px; border: 1px solid var(--border-strong); border-radius: 5px;
+  background: var(--surface-2); color: var(--ink); padding: 0 10px; font-size: 11.5px;
+  outline: none;
+}
+.detail-search input:focus { border-color: var(--brand); background: #fff; }
+.detail-search input::placeholder { color: #a8b3c2; }
+.detail-hint { font-size: 10px; color: var(--muted); }
+.detail-head { align-items: center; }
+.detail-head .pill-tabs { margin-left: auto; }
+.detail-tbl { max-height: 246px; }
+
+table.data th.sortable { cursor: pointer; user-select: none; }
+table.data th.sortable:hover { background: linear-gradient(180deg, #cfe1fc, #e3efff); }
+table.data th .sort-mark {
+  font-style: normal; font-size: 8px; color: #a8bcd8; margin-left: 3px; opacity: .9;
+}
+table.data th.sorted .sort-mark { color: var(--brand); }
+table.data th.hl { background: linear-gradient(180deg, #bcd7fb, #d9e9fe); color: #17376b; }
+table.data td.hl { background: #f2f8ff; font-weight: 700; color: #1c3f70; }
+table.data tbody tr:nth-child(even) td.hl { background: #e8f2ff; }
+
+/* ------------------------------------------------------------ 能力边界（可折叠） */
+.capability-box {
+  margin-top: 12px; padding: 7px 11px; font-size: 11px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.capability-box summary { cursor: pointer; color: var(--ink-2); font-weight: 650; }
+.capability-box summary b { color: var(--brand); }
+#capability-count { color: var(--warn); margin-left: 8px; font-weight: 700; }
+.cap-hint { color: var(--muted); font-weight: 400; margin-left: 10px; font-size: 10px; }
+.capability-body {
+  margin-top: 8px; display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px;
+}
+.cap-item {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-left: 3px solid var(--warn); border-radius: 5px; padding: 6px 9px;
+}
+.cap-item h4 { margin: 0 0 3px; font-size: 11px; color: var(--ink); }
+.cap-item p { margin: 2px 0; font-size: 10px; color: var(--muted); line-height: 1.45; }
+.cap-item p b { color: var(--ink-2); }
+.cap-notes { grid-column: 1 / -1; border-left-color: var(--brand); }
+.cap-notes ul { margin: 3px 0 0; padding-left: 16px; color: var(--ink-2); font-size: 10px; }
+.cap-matrix { grid-column: 1 / -1; border-left-color: var(--brand-2); }
+table.matrix { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 4px; }
+table.matrix th, table.matrix td {
+  border: 1px solid var(--border); padding: 3px 6px; text-align: center; color: var(--ink-2);
+}
+table.matrix th { background: var(--surface); font-weight: 700; }
+table.matrix td.no { color: #b9c4d3; }
+
+/* ------------------------------------------------------------ 间距：分区之间更松 */
+.row-label { margin: 14px 2px 7px; }
+.row-label:first-of-type { margin-top: 10px; }
+
+/* ------------------------------------------------------------ 响应式 */
+@media (max-width: 1360px) {
+  .kpi-duo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-2 { grid-template-columns: minmax(0, 1fr); }
+  .capability-body { grid-template-columns: 1fr; }
+  .kpi-duo .kpi-value { font-size: 27px; }
+}

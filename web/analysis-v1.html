@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>综合经营分析 · 六维度 · Y26 2026 · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/analysis.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================================================== A 顶部筛选区 -->
+  <header class="topbar">
+    <div class="title-block">
+      <span class="title-bar"></span>
+      <h1>星禾食品 BI 数据中心</h1>
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link" href="/dashboard.html">全国经营驾驶舱</a>
+      <a class="nav-link is-current" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link" href="/pos.html">POS 分析</a>
+      <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+      <span class="badge badge-scope" id="scope-badge">五大战区合计（不含战区F、战区G）</span>
+    </div>
+    <div class="filters" id="global-filters">
+      <div class="fitem"><label>月份</label><select data-filter="months" id="f-month"></select></div>
+      <div class="fitem"><label>战区</label><select data-filter="regions" id="f-region"></select></div>
+      <div class="fitem"><label>渠道</label><select data-filter="channel" id="f-channel"></select></div>
+      <div class="fitem"><label>KA 系统</label><select data-filter="ka" id="f-ka"></select></div>
+      <div class="fitem"><label>客户</label><select data-filter="customer" id="f-customer"></select></div>
+      <div class="fitem"><label>品类</label><select data-filter="category" id="f-category"></select></div>
+      <div class="fitem"><label>SKU</label><select data-filter="sku" id="f-sku"></select></div>
+      <button class="btn btn-reset" id="btn-reset">重置</button>
+    </div>
+  </header>
+
+  <!-- ===================================================== 口径横幅 -->
+  <div class="subbar">
+    <span class="chip chip-year" id="chip-period">Y26 · 2026 年 1–10 月</span>
+    <span class="chip plain" id="chip-dim">分析维度：战区</span>
+    <span class="chip plain">定位：维度内拆解 · 集团总量见驾驶舱</span>
+    <span class="chip plain" id="chip-month">全部月份</span>
+    <span id="active-chips" class="chips"></span>
+    <span class="subbar-right">
+      <span class="status" id="status-badge">就绪</span>
+      <button class="btn btn-sm btn-primary" id="btn-refresh">刷新</button>
+    </span>
+  </div>
+
+  <!-- ===================================================== 维度切换 -->
+  <section class="dim-bar" aria-label="分析维度切换">
+    <span class="dim-label">分析维度</span>
+    <div class="dim-tabs" id="dim-tabs">
+      <button data-dim="region" class="on">战区</button>
+      <button data-dim="channel">渠道</button>
+      <button data-dim="ka">KA 系统<em class="dim-sys">POS</em></button>
+      <button data-dim="customer">客户<em class="dim-sys">ERP</em></button>
+      <button data-dim="category">品类</button>
+      <button data-dim="sku">SKU</button>
+    </div>
+    <div class="dim-hint" id="dim-hint"></div>
+  </section>
+
+  <div class="alert alert-error hidden" id="alert"></div>
+
+  <!-- ===================================================== B 核心 KPI -->
+  <div class="row-label">
+    <b>当前维度合计</b>
+    <span id="kpi-sub">金额为主指标 · 盒数 / TE / 毛利见卡内辅助信息 · ERP Sell-in 与 POS Sell-out 分列不相加</span>
+    <div class="pill-tabs lbl-right" id="kpi-metric">
+      <button data-metric="amount" class="on">金额</button>
+      <button data-metric="boxes">盒数</button>
+      <button data-metric="te">TE</button>
+    </div>
+  </div>
+  <section class="kpi-duo" id="kpi-row" aria-label="核心经营指标"></section>
+
+  <!-- ===================================================== C-1 经营趋势 -->
+  <div class="row-label"><b>经营趋势</b><span id="trend-sub">当前维度金额 TOP 成员 · 完整 Y26 1–10 月</span></div>
+  <section class="grid-1">
+    <div class="card trend-card">
+      <div class="card-head">
+        <h3 id="h-trend">月度趋势</h3>
+        <div class="pill-tabs" id="trend-side">
+          <button data-side="pos" class="on">POS</button><button data-side="erp">ERP</button>
+        </div>
+        <div class="pill-tabs" id="trend-metric">
+          <button data-metric="amount" class="on">金额</button><button data-metric="boxes">盒数</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-trend"></div>
+      <div class="mini-legend" id="legend-trend"></div>
+      <div class="card-foot" id="foot-trend"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== C-2 维度分析 -->
+  <div class="row-label"><b id="dim-area-title">维度分析 · 战区</b><span id="dim-area-sub"></span></div>
+  <section class="grid-2" id="dim-area">
+    <div class="card" id="card-rank">
+      <div class="card-head">
+        <h3 id="h-rank">销售排名</h3>
+        <div class="pill-tabs" id="rank-side">
+          <button data-side="pos" class="on">POS</button><button data-side="erp">ERP</button>
+        </div>
+        <div class="pill-tabs" id="rank-metric">
+          <button data-metric="amount" class="on">金额</button><button data-metric="boxes">盒数</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-rank"></div>
+      <div class="card-foot" id="foot-rank"></div>
+    </div>
+    <div class="card" id="card-struct">
+      <div class="card-head">
+        <h3 id="h-struct">销售结构</h3>
+        <div class="pill-tabs" id="struct-side">
+          <button data-side="pos" class="on">POS</button><button data-side="erp">ERP</button>
+        </div>
+        <div class="pill-tabs hidden" id="struct-mode">
+          <button data-attr="pieces" class="on">粒数</button><button data-attr="spec">规格</button>
+        </div>
+      </div>
+      <div class="chart-host" id="chart-struct"></div>
+      <div class="mini-legend" id="legend-struct"></div>
+      <div class="card-foot" id="foot-struct"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 口径边界 -->
+  <details class="capability-box" id="capability-box">
+    <summary><b>口径说明与现有数据不支持的分析项</b>
+      <span id="capability-count"></span>
+      <span class="cap-hint">展开查看（本页不编造指标、不修改 ETL）</span></summary>
+    <div class="capability-body" id="capability-list"></div>
+  </details>
+
+  <!-- ===================================================== D 经营明细 -->
+  <div class="row-label"><b>经营明细</b><span id="detail-sub">按当前维度动态展示字段 · 筛选沿用顶部全局条件</span></div>
+  <section class="card detail-card">
+    <div class="detail-head">
+      <div class="detail-search">
+        <input type="search" id="detail-q" placeholder="搜索 SKU / 客户 / 门店 / 战区…" maxlength="40" autocomplete="off">
+        <button class="btn btn-sm hidden" id="detail-q-clear">清除</button>
+      </div>
+      <span class="detail-hint" id="detail-sort-hint">点击表头可排序</span>
+      <div class="pill-tabs" id="detail-source">
+        <button data-source="pos" class="on">POS 终端销售</button><button data-source="erp">ERP 出货</button>
+      </div>
+      <button class="btn btn-sm" id="btn-drawer">展开全屏明细</button>
+    </div>
+    <div class="tbl-wrap detail-tbl" id="detail-table"></div>
+    <div class="detail-foot">
+      <span id="detail-count"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-sm" id="detail-prev">上一页</button>
+      <span id="detail-page" class="page-label"></span>
+      <button class="btn btn-sm" id="detail-next">下一页</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a></span>
+    <span><b>数据源</b> bi_data_layer_v1/database/bi_data_layer_v1.db · SQLite mode=ro</span>
+    <span><b>口径</b> P01 五大战区 / Y26 2026-01-01 ~ 2026-10-31 自然月</span>
+    <span><b>维度</b> 战区 / 渠道 / KA 系统 / 客户 / 品类 / SKU 共用同一套指标</span>
+    <span><b>边界</b> ERP × POS 独立核算 / 前端不重算指标 / 无静态假数据</span>
+  </footer>
+</div>
+
+<!-- ===================================================== 全屏明细抽屉 -->
+<div class="modal-mask hidden" id="modal">
+  <div class="drawer">
+    <div class="drawer-head">
+      <h3>数据明细</h3><span class="sub" id="drawer-sub"></span>
+      <button class="btn btn-sm" style="margin-left:auto" id="drawer-close">关闭</button>
+    </div>
+    <div class="drawer-body"><div class="tbl-wrap" id="drawer-table"></div></div>
+    <div class="drawer-foot">
+      <span id="drawer-count"></span>
+      <button class="btn btn-sm" id="page-prev" style="margin-left:auto">上一页</button>
+      <span id="page-label"></span>
+      <button class="btn btn-sm" id="page-next">下一页</button>
+      <button class="btn btn-sm" id="source-toggle">切换 POS / ERP</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="/analysis-v1.js"></script>
+</body>
+</html>

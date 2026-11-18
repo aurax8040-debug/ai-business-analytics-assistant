@@ -1,0 +1,116 @@
+/* =====================================================================
+   战区销售分析 V1 — 页面专属样式（叠加在 styles.css 之上）
+   目标：与全国经营驾驶舱 V1.1 完全一致的企业级 BI 视觉；
+        本文件只新增页面专属 class，不覆盖、不修改任何既有样式规则。
+   ===================================================================== */
+
+/* ------------------------------------------------------------ 导航 */
+.nav-link {
+  font-size: 10.5px; font-weight: 650; color: var(--brand);
+  text-decoration: none; white-space: nowrap; padding: 2px 7px;
+  border: 1px solid var(--border-strong); border-radius: 4px; background: var(--surface-2);
+}
+.nav-link:hover { background: var(--brand-soft); border-color: var(--brand); }
+
+/* ------------------------------------------------------------ 第一行：5 张战区卡 */
+.grid-5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.region-tile {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 4px solid var(--brand-2); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 8px 11px 7px; min-width: 0;
+  cursor: pointer; transition: .15s ease;
+}
+.region-tile:hover { border-color: var(--brand); transform: translateY(-1px); }
+.region-tile.on {
+  border-color: var(--brand); border-left-color: var(--brand); background: #f7fbff;
+  box-shadow: 0 0 0 2px rgba(47, 111, 228, .13), var(--shadow);
+}
+.tile-top { display: flex; align-items: center; gap: 6px; }
+.tile-name { font-size: 13px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.tile-rank {
+  font-size: 9.5px; font-weight: 750; color: var(--brand); background: var(--brand-soft);
+  border-radius: 3px; padding: 1px 5px; white-space: nowrap;
+}
+.tile-sub { margin-left: auto; font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+.tile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 10px; margin-top: 6px; }
+.tile-cell { min-width: 0; }
+.tile-sys { font-size: 9.5px; font-weight: 700; color: var(--muted); letter-spacing: .3px; }
+.tile-val {
+  font-size: 17px; line-height: 1.2; font-weight: 800; letter-spacing: -.4px;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.tile-erp .tile-val { color: var(--brand); }
+.tile-pos .tile-val { color: #0e9f8a; }
+.tile-share { font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+
+/* groupedBar 系列图例（图表组件本身不画图例，页面侧补齐，不改 charts.js） */
+.mini-legend {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: 2px 9px; min-height: 14px; margin-top: 1px;
+  font-size: 9.5px; color: var(--muted);
+}
+.mini-legend span { white-space: nowrap; }
+.mini-legend i {
+  display: inline-block; width: 7px; height: 7px; border-radius: 2px;
+  margin-right: 3px; vertical-align: middle;
+}
+
+/* ------------------------------------------------------------ ERP / POS 对照表 */
+.compare-card { min-height: 0; }
+.compare-card .tbl-wrap { max-height: none; }
+table.compare { border-collapse: collapse; width: 100%; font-size: 10.5px; }
+table.compare th {
+  color: #2a4d84; font-weight: 750; text-align: center; padding: 6px 8px;
+  white-space: nowrap; border-bottom: 1px solid #c9dcf7;
+  background: linear-gradient(180deg, var(--thead-1), var(--thead-2));
+}
+table.compare th.th-erp { background: linear-gradient(180deg, #cfe1fc, #e6f0ff); }
+table.compare th.th-pos { background: linear-gradient(180deg, #d3f0e8, #e9f9f4); color: #0b7a68; }
+table.compare td {
+  padding: 5px 8px; border-bottom: 1px solid #eef3fb; white-space: nowrap;
+  font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right;
+}
+table.compare td:first-child, table.compare th:first-child { text-align: left; }
+table.compare td.pos-col { background: #f6fcfa; }
+table.compare tbody tr:nth-child(even) td:not(.pos-col) { background: #f6faff; }
+table.compare tbody tr:hover td { background: #eaf3ff; }
+table.compare td.rank-cell { color: var(--brand); font-weight: 750; }
+.compare-sys-tag {
+  display: inline-block; font-size: 9.5px; font-weight: 700; border-radius: 3px;
+  padding: 1px 5px; margin-right: 4px;
+}
+.compare-sys-tag.erp { background: var(--brand-soft); color: var(--brand); }
+.compare-sys-tag.pos { background: #dff5ef; color: #0b7a68; }
+
+/* ------------------------------------------------------------ 能力边界（可折叠） */
+.capability-box {
+  margin-top: 9px; padding: 7px 11px; font-size: 11px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.capability-box summary { cursor: pointer; color: var(--ink-2); font-weight: 650; }
+.capability-box summary b { color: var(--brand); }
+#capability-count { color: var(--warn); margin-left: 8px; font-weight: 700; }
+.cap-hint { color: var(--muted); font-weight: 400; margin-left: 10px; font-size: 10px; }
+.capability-body {
+  margin-top: 8px; display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px;
+}
+.cap-item {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-left: 3px solid var(--warn); border-radius: 5px; padding: 6px 9px;
+}
+.cap-item h4 { margin: 0 0 3px; font-size: 11px; color: var(--ink); }
+.cap-item p { margin: 2px 0; font-size: 10px; color: var(--muted); line-height: 1.45; }
+.cap-item p b { color: var(--ink-2); }
+.cap-notes { grid-column: 1 / -1; border-left-color: var(--brand); }
+.cap-notes ul { margin: 3px 0 0; padding-left: 16px; color: var(--ink-2); font-size: 10px; }
+
+/* ------------------------------------------------------------ 响应式 */
+@media (max-width: 1360px) {
+  .grid-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .capability-body { grid-template-columns: 1fr; }
+}
+@media (max-width: 1080px) {
+  .grid-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

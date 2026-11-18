@@ -1,0 +1,15 @@
+# AI 经营助手（LangGraph Agent V1）依赖
+#
+# 业务侧（BI 页面 / 原有接口）仍然是零依赖：不装本文件也能跑全部 BI 页面与 400+ 单测，
+# 只有 /api/agent/* 与 /agent.html 需要下面这些包。
+#
+# 安装：
+#   python3 -m pip install -r requirements-agent.txt
+# 国内网络较慢时用镜像：
+#   python3 -m pip install -i https://mirrors.aliyun.com/pypi/simple/ -r requirements-agent.txt
+#
+# 版本说明：Python 3.13，langgraph 1.2.x 为当前稳定线；openai 2.x/3.x 均可，
+# 只用 chat.completions 这一条最稳的接口。
+langgraph>=1.2,<2
+openai>=1.40
+python-dotenv>=1.0

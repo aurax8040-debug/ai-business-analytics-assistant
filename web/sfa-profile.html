@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SFA 门店画像分析 · Y26 2026 · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/board.css">
+<link rel="stylesheet" href="/agent-dock.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================================================== 顶部筛选区 -->
+  <header class="topbar board-topbar">
+    <div class="title-block">
+      <span class="title-bar"></span>
+      <h1>星禾食品 BI 数据中心</h1>
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link" href="/pos.html">POS 分析</a>
+      <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link is-current" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+      <a class="nav-link" href="/sc.html">供应链看板</a>
+    </div>
+    <div class="filters board-filters" id="global-filters">
+      <div class="fitem"><label>月份</label><select id="f-month"></select></div>
+      <div class="fitem"><label>战区</label><select id="f-region"></select></div>
+      <div class="fitem"><label>市场部</label><select id="f-md"></select></div>
+      <div class="fitem"><label>客户经理</label><select id="f-employee"></select></div>
+      <div class="fitem"><label>KA 系统</label><select id="f-ka"></select></div>
+      <div class="fitem"><label>热门 SKU</label><select id="f-sku"></select></div>
+      <button class="btn btn-reset" id="btn-reset">重置</button>
+    </div>
+  </header>
+
+  <div class="subbar">
+    <span class="chip chip-year" id="chip-period">Y26 · 2026 年 1–10 月</span>
+    <span class="chip plain" id="chip-window">数据窗口 —</span>
+    <span class="chip plain" id="chip-scope">门店口径：有效拜访到店</span>
+    <span id="active-chips" class="chips"></span>
+    <span class="subbar-right">
+      <span class="status" id="status-badge">就绪</span>
+      <button class="btn btn-sm btn-primary" id="btn-refresh">刷新</button>
+    </span>
+  </div>
+
+  <div class="alert alert-error hidden" id="alert"></div>
+
+  <div class="notice notice-info" id="notice-main">
+    <div class="notice-body" id="notice-main-text">正在读取门店画像数据…</div>
+  </div>
+
+  <!-- ===================================================== KPI -->
+  <div class="row-label">
+    <b>门店画像概览</b>
+    <span id="kpi-sub">门店口径 = 有效拜访实际到过的门店 · 字段为空一律记为「未采集」，不当作未执行</span>
+  </div>
+  <section class="kpi-row six" id="kpi-row" aria-label="门店画像概览"></section>
+
+  <!-- ===================================================== A 门店基本画像 -->
+  <div class="row-label"><b>A 门店基本画像</b><span>KA 系统 · 门店等级 · 渠道结构 · 战区分布</span></div>
+  <section class="board-grid two">
+    <div class="card tall">
+      <div class="card-head"><h3>KA 系统分布</h3><span class="card-tag">按门店数</span>
+        <div class="pill-tabs" id="ka-mode">
+          <button data-mode="count" class="on">门店数</button><button data-mode="share">占比</button>
+        </div></div>
+      <div class="chart-host" id="chart-ka"></div>
+      <div class="card-foot" id="foot-ka"></div>
+    </div>
+
+    <div class="card tall">
+      <div class="card-head"><h3>门店等级与渠道结构</h3></div>
+      <div class="bullet-head" style="grid-template-columns:60px minmax(0,1fr) 52px 46px">
+        <span>分组</span><span>门店数</span><span>数量</span><span>占比</span></div>
+      <div class="bullet-list" id="chart-level"></div>
+      <div class="mini-legend" id="legend-channel"></div>
+      <div class="card-foot" id="foot-level"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== B/C 热门 SKU 与价格 -->
+  <div class="row-label"><b>B 门店 SKU 结构 · C 门店价格</b>
+    <span>热门 SKU 为现场反馈（不代表全部在售）· 价格为门店前端标价（元/盒）</span></div>
+  <section class="board-grid two">
+    <div class="card tall">
+      <div class="card-head"><h3>门店热门 SKU 排名</h3><span class="card-tag">现场反馈</span>
+        <div class="pill-tabs" id="hot-mode">
+          <button data-mode="feedback" class="on">反馈次数</button><button data-mode="stores">门店数</button>
+        </div></div>
+      <div class="chart-host" id="chart-hot"></div>
+      <div class="card-foot" id="foot-hot"></div>
+    </div>
+
+    <div class="card tall">
+      <div class="card-head"><h3>前端零售价分布</h3><span class="card-tag">元/盒 · 四分位区间</span></div>
+      <div class="chart-host" id="chart-price"></div>
+      <div class="card-foot" id="foot-price"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== D 陈列执行 + 联合分析 -->
+  <div class="row-label"><b>D 陈列与现场执行 · SFA × POS 联合分析</b>
+    <span>字段为空 = 未采集；联合分析只在可关联门店内进行</span></div>
+  <section class="board-grid two">
+    <div class="card tall">
+      <div class="card-head"><h3>现场执行采集情况</h3><span class="card-tag">采集率</span></div>
+      <div class="bullet-head" style="grid-template-columns:84px minmax(0,1fr) 58px 46px">
+        <span>字段</span><span>已采集 / 有效拜访</span><span>已采集</span><span>采集率</span></div>
+      <div class="bullet-list" id="chart-display"></div>
+      <div class="fact-list" id="fact-display"></div>
+      <div class="card-foot" id="foot-display"></div>
+    </div>
+
+    <div class="card tall">
+      <div class="card-head"><h3>SFA 现场反馈 × POS 实际销售</h3><span class="card-tag">仅可关联门店</span></div>
+      <div class="fact-list" id="fact-joint"></div>
+      <div class="tbl-wrap" id="joint-table" style="margin-top:8px;max-height:190px"></div>
+      <div class="card-foot" id="foot-joint"></div>
+    </div>
+  </section>
+
+  <details class="capability-box" id="capability-box">
+    <summary><b>口径说明与数据限制</b><span id="capability-count"></span>
+      <span class="cap-hint">展开查看（不猜测映射、不补造数据、不改 ETL）</span></summary>
+    <div class="capability-body" id="capability-list"></div>
+  </details>
+
+  <!-- ===================================================== 明细 -->
+  <div class="row-label"><b>门店画像明细</b><span id="detail-sub">按门店展开现场反馈与采集情况</span></div>
+  <section class="card detail-card">
+    <div class="board-detail-head">
+      <div class="detail-search">
+        <input type="search" id="detail-q" placeholder="搜索门店 / KA / 市场部 / SKU…" maxlength="40" autocomplete="off">
+      </div>
+      <span class="detail-hint" id="detail-sort-hint">点击表头可排序</span>
+      <span class="grow"></span>
+      <span class="seg-label">共 <b id="detail-total">—</b> 家门店</span>
+    </div>
+    <div class="tbl-wrap detail-tbl" id="detail-table"></div>
+    <div class="detail-foot">
+      <span id="detail-count"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-sm" id="detail-prev">上一页</button>
+      <span id="detail-page" class="page-label"></span>
+      <button class="btn btn-sm" id="detail-next">下一页</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span><b>目录</b> <a class="foot-link" href="/portal.html">全部页面</a></span>
+    <span><b>数据源</b> fact_sfa_visit / dim_store / dim_sku（ETL V1 只读）</span>
+    <span><b>联合分析</b> bridge_sfa_pos_store + fact_pos_sales，仅 27 家可关联门店</span>
+    <span><b>口径</b> P01 五大战区 / Y26 / 门店前端标价元每盒</span>
+    <span><b>边界</b> 未采集 ≠ 未执行 / POS 无记录 ≠ 零销售 / 无静态假数据</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="/sfa-profile.js"></script>
+<script src="/page-context.js"></script>
+<script src="/agent-dock.js"></script>
+</body>
+</html>

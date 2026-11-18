@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 经营驾驶舱 · 2026 · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/cockpit.css">
+<link rel="stylesheet" href="/agent-dock.css">
+</head>
+<body class="ck-body">
+
+<!-- ============================================================ 顶部导航（全站七入口） -->
+<div class="ck-navbar">
+  <span class="ck-navbrand">星禾食品 BI 数据中心</span>
+  <nav class="ck-nav">
+    <a class="nav-link is-current" href="/">AI 经营驾驶舱</a>
+    <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+    <a class="nav-link" href="/pos.html">POS 分析</a>
+    <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+    <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+    <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+    <a class="nav-link" href="/sc.html">供应链看板</a>
+  </nav>
+  <a class="ck-navall" href="/portal.html">全部页面</a>
+</div>
+
+<div class="ck-shell">
+
+  <!-- ============================================================ 标题 + 筛选 -->
+  <header class="ck-header">
+    <div class="ck-title">
+      <span class="ck-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 17l5-5 4 3 5-7 4 4"/><path d="M3 21h18"/>
+        </svg>
+      </span>
+      <div class="ck-titletext">
+        <h1>AI 经营驾驶舱</h1>
+        <p>管理层经营总览 · 销售达成、预测与利润 · 结构、执行与明细 · AI 洞察</p>
+      </div>
+    </div>
+
+    <div class="ck-filters" id="ck-filters">
+      <label class="ck-field"><span>年份</span>
+        <select id="f-year" aria-label="年份"></select></label>
+      <label class="ck-field"><span>月份</span>
+        <select id="f-month" aria-label="月份"></select></label>
+      <label class="ck-field"><span>战区</span>
+        <select id="f-region" aria-label="战区"></select></label>
+      <label class="ck-field"><span>客户</span>
+        <select id="f-ka" aria-label="客户 / 渠道分组"></select></label>
+      <button class="ck-btn" id="btn-reset" type="button">重置</button>
+      <button class="ck-btn" id="btn-refresh" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+        刷新
+      </button>
+      <button class="ck-btn ck-btn-ai" id="btn-ai" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.9 4.6L18.5 9.4 13.9 11.3 12 15.9 10.1 11.3 5.5 9.4 10.1 7.6z"/>
+          <path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>
+        </svg>
+        生成经营分析
+      </button>
+    </div>
+  </header>
+
+  <div class="ck-strip">
+    <span class="ck-chip ck-chip-period" id="period-chip">2026 年 1–10 月累计</span>
+    <span class="ck-chip" id="scope-chip">战区：全国 · 客户：全部客户</span>
+    <span class="ck-chip ck-chip-soft">ERP · POS · SFA · 批发 各自核算</span>
+    <span class="ck-chip ck-chip-soft" id="budget-chip">TE 预算 · 模拟数据</span>
+    <span class="ck-strip-right">
+      <span class="ck-status" id="status">就绪</span>
+      <span class="ck-dot" id="status-dot"></span>
+    </span>
+  </div>
+
+  <div class="ck-error hidden" id="ck-error"></div>
+
+  <!-- ============================================================ 第一排：六张 KPI -->
+  <section class="ck-kpis" id="kpi-grid" aria-label="核心经营指标">
+    <article class="ck-kpi ck-skeleton"></article><article class="ck-kpi ck-skeleton"></article>
+    <article class="ck-kpi ck-skeleton"></article><article class="ck-kpi ck-skeleton"></article>
+    <article class="ck-kpi ck-skeleton"></article><article class="ck-kpi ck-skeleton"></article>
+  </section>
+
+  <!-- ============================================================ 第二排：地图 + 预算达成对比 -->
+  <section class="ck-grid ck-grid-2">
+    <article class="ck-card ck-map-card">
+      <header class="ck-cardhead">
+        <h2>战区销售分布</h2>
+        <span class="ck-tag" id="map-tag">实际 TE · 5 大战区</span>
+      </header>
+      <div class="ck-map-body">
+        <div class="ck-map-col">
+          <div class="ck-map" id="ck-map" role="img" aria-label="五大战区 TE 分布气泡地图"></div>
+          <p class="ck-foot-note" title="气泡大小 = 实际出货量 TE；底图为标准中国地图（含台港澳与南海诸岛），按真实边界绘制，颜色深浅不代表数据">
+            气泡大小 = 实际 TE
+          </p>
+        </div>
+        <div class="ck-regionstrip" id="region-strip"></div>
+      </div>
+    </article>
+
+    <article class="ck-card">
+      <header class="ck-cardhead">
+        <h2>预算达成与销售预测</h2>
+        <span class="ck-tag">战区口径 · 单位 TE</span>
+      </header>
+      <div class="ck-cmp-legend">
+        <span class="ck-lg"><i class="ck-sw ck-sw-budget"></i>同期预算 TE</span>
+        <span class="ck-lg"><i class="ck-sw ck-sw-actual"></i>同期实际 TE</span>
+        <span class="ck-lg ck-lg-hint">预测列为全年 12 个月口径，不与同期预算相减</span>
+      </div>
+      <div class="ck-cmp" id="cmp-chart"></div>
+      <p class="ck-foot-note" id="cmp-note">
+        达成率 = 同期实际 ÷ 同期预算；预测为全年 12 个月口径（1–10 月实际 + 11–12 月模型外推）。
+      </p>
+    </article>
+  </section>
+
+  <!-- ============================================================ 第三排：趋势 + KA + 利润 -->
+  <section class="ck-grid ck-grid-3">
+    <article class="ck-card ck-span-5">
+      <header class="ck-cardhead">
+        <h2>销售趋势与预测</h2>
+        <div class="ck-tabs" id="trend-grain">
+          <button data-grain="month" class="on" type="button">月度</button>
+          <button data-grain="quarter" type="button">季度</button>
+        </div>
+        <div class="ck-tabs ck-tabs-soft" id="trend-metric">
+          <button data-metric="te" class="on" type="button">TE</button>
+          <button data-metric="amount" type="button">金额</button>
+        </div>
+      </header>
+      <div class="ck-chart" id="trend-chart"></div>
+      <div class="ck-legend" id="trend-legend">
+        <span class="ck-lg"><i class="ck-sw ck-sw-actual"></i>实际</span>
+        <span class="ck-lg"><i class="ck-sw ck-sw-fc"></i>预测（11–12 月）</span>
+        <span class="ck-lg ck-lg-hint">预算与达成率不重复，见上方对比卡</span>
+      </div>
+      <p class="ck-foot-note" id="trend-note"></p>
+    </article>
+
+    <article class="ck-card ck-span-4">
+      <header class="ck-cardhead">
+        <h2>客户贡献：KA / 批发</h2>
+        <span class="ck-tag" id="ka-tag">ERP 客户级</span>
+      </header>
+      <div class="ck-mix" id="mix-strip"></div>
+      <div class="ck-ka2" id="ka-split"></div>
+      <p class="ck-foot-note" id="ka-note"></p>
+    </article>
+
+    <article class="ck-card ck-span-3">
+      <header class="ck-cardhead">
+        <h2>利润分析</h2>
+        <span class="ck-tag">毛利额 / 毛利率</span>
+      </header>
+      <div class="ck-profit">
+        <div class="ck-profit-hero">
+          <div><span class="ck-ph-label">毛利额</span><b id="pf-gp">—</b></div>
+          <div><span class="ck-ph-label">毛利率</span><b id="pf-gm">—</b></div>
+        </div>
+        <div class="ck-profit-bars" id="profit-chart"></div>
+      </div>
+      <p class="ck-foot-note" title="毛利额 = ERP 出货金额 − 成本金额；毛利率 = Σ毛利 ÷ Σ金额，不做单笔平均">毛利率 = Σ毛利 ÷ Σ金额</p>
+    </article>
+  </section>
+
+  <!-- ============================================================ 第四排：执行与库存（原全国驾驶舱并入） -->
+  <section class="ck-grid ck-grid-3">
+    <article class="ck-card ck-span-6">
+      <header class="ck-cardhead">
+        <h2>SFA 拜访执行</h2>
+        <span class="ck-tag" id="x-sfa-tag">窗口累计</span>
+        <a class="ck-cardhead-note" href="/sfa-visit.html">详情 →</a>
+      </header>
+      <div class="ck-stats" id="x-sfa-stats"></div>
+      <div class="ck-prog" id="x-sfa-prog"></div>
+      <p class="ck-foot-note" id="x-sfa-foot"></p>
+    </article>
+
+    <article class="ck-card ck-span-6">
+      <header class="ck-cardhead">
+        <h2>批发库存与出库</h2>
+        <span class="ck-tag">时点值</span>
+        <a class="ck-cardhead-note" href="/wholesale.html">详情 →</a>
+      </header>
+      <div class="ck-stats" id="x-wh-stats"></div>
+      <div class="ck-mini-sm" id="x-wh-chart"></div>
+      <p class="ck-foot-note" id="x-wh-foot"></p>
+    </article>
+  </section>
+
+  <!-- ============================================================ 第五排：结构与动销（原全国驾驶舱并入） -->
+  <section class="ck-grid ck-grid-3">
+    <article class="ck-card ck-span-6">
+      <header class="ck-cardhead">
+        <h2>SKU 动销 TOP10</h2>
+        <span class="ck-tag">POS 终端</span>
+        <a class="ck-cardhead-note" href="/pos.html">详情 →</a>
+      </header>
+      <div class="ck-mini" id="x-sku-chart"></div>
+      <p class="ck-foot-note" id="x-sku-foot"></p>
+    </article>
+
+    <article class="ck-card ck-span-6">
+      <header class="ck-cardhead">
+        <h2>品类与粒数结构</h2>
+        <span class="ck-tag" id="x-struct-tag"></span>
+        <div class="ck-tabs ck-tabs-soft" id="x-struct-tabs">
+          <button data-struct="category" class="on" type="button">品类</button>
+          <button data-struct="pieces" type="button">粒数</button>
+        </div>
+      </header>
+      <div class="ck-mini" id="x-struct-chart"></div>
+      <p class="ck-foot-note" id="x-struct-foot"></p>
+    </article>
+  </section>
+
+  <!-- ============================================================ 第六排：经营明细（原全国驾驶舱并入） -->
+  <section class="ck-grid ck-grid-12">
+    <article class="ck-card ck-span-12">
+      <header class="ck-cardhead">
+        <h2>经营明细</h2>
+        <span class="ck-tag" id="x-detail-tag">POS 终端销售</span>
+        <div class="ck-tabs ck-tabs-soft" id="x-detail-src">
+          <button data-source="pos" class="on" type="button">POS 终端</button>
+          <button data-source="erp" type="button">ERP 出货</button>
+        </div>
+        <span class="ck-cardhead-note">随月份 / 战区联动 · 服务端分页</span>
+      </header>
+      <div class="ck-tbl" id="x-detail-table"></div>
+      <div class="ck-pager" style="margin-top:6px">
+        <span id="x-detail-count"></span>
+        <span style="flex:1"></span>
+        <button class="ck-btn" id="x-detail-prev" type="button">上一页</button>
+        <span id="x-detail-page">第 1 页</span>
+        <button class="ck-btn" id="x-detail-next" type="button">下一页</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============================================================ 第七排：异常 + AI 入口 -->
+  <section class="ck-grid ck-grid-12">
+    <article class="ck-card ck-span-9">
+      <header class="ck-cardhead">
+        <h2>需重点关注的经营异常</h2>
+        <span class="ck-tag" id="alert-count">—</span>
+        <span class="ck-cardhead-note">点击下钻</span>
+      </header>
+      <div class="ck-alerts" id="alert-list"></div>
+    </article>
+
+    <article class="ck-card ck-ai-card ck-span-3">
+      <header class="ck-cardhead">
+        <h2>AI 经营洞察</h2>
+        <span class="ck-tag ck-tag-soft">按需生成</span>
+      </header>
+      <div class="ck-ai-body">
+        <p class="ck-ai-lead">
+          不做自动播报。按当前筛选条件，把<b>事实 / 推测 / 建议</b>分层给出，数据不足直接说明不补写。
+        </p>
+        <button class="ck-btn ck-btn-ai ck-btn-block" id="btn-ai-2" type="button">生成经营分析</button>
+        <button class="ck-btn ck-btn-block ck-btn-agent" id="btn-agent-dock" type="button"
+                aria-haspopup="dialog" aria-controls="agent-dock">
+          <span>在这里问 AI 助手</span>
+          <span class="ck-btn-agent-tag">不跳页</span>
+        </button>
+        <p class="ck-ai-bound">就在本页对话 · 自动带上当前筛选，边看数边追问</p>
+      </div>
+    </article>
+  </section>
+
+  <footer class="ck-footer">
+    <span><b>数据</b> ERP Sell-in · POS Sell-out · SFA 拜访 · 批发进销存 · 各自核算</span>
+    <span title="MOCK_BUDGET_TE（模拟 TE 预算，非真实业务预算；批次见顶部预算标签）"><b>预算</b> 模拟 TE 预算</span>
+    <span><b>边界</b> 四模块金额永不相加 · 原「全国经营驾驶舱」已并入本页</span>
+    <span><a class="foot-link" href="/portal.html">全部页面</a></span>
+  </footer>
+</div>
+
+<!-- ============================================================ AI 洞察抽屉 -->
+<div class="ck-mask hidden" id="ai-mask"></div>
+<aside class="ck-drawer hidden" id="ai-drawer" aria-hidden="true" aria-label="AI 经营洞察">
+  <header class="ck-drawer-head">
+    <div>
+      <h2>AI 经营洞察</h2>
+      <p id="ai-scope">—</p>
+    </div>
+    <button class="ck-icon-btn" id="ai-close" type="button" aria-label="关闭">×</button>
+  </header>
+  <div class="ck-drawer-body" id="ai-body"></div>
+  <footer class="ck-drawer-foot">
+    <span id="ai-engine">规则诊断引擎 v1</span>
+    <button class="ck-btn" id="ai-regen" type="button">重新生成</button>
+  </footer>
+</aside>
+
+<div class="ck-toast" id="ck-toast"></div>
+<script type="module" src="/cockpit.js"></script>
+<script type="module" src="/cockpit-ext.js"></script>
+<script src="/page-context.js"></script>
+<script type="module" src="/agent-dock.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 经营助手 · LangGraph Agent · Marketing Intelligence Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/nav.css">
+<link rel="stylesheet" href="/board.css">
+<link rel="stylesheet" href="/agent.css">
+<script>
+/* 嵌入模式：由驾驶舱的页内对话坞用 iframe 打开（?embed=1）。
+   放在 head 里同步执行，避免先按整页渲染再跳成紧凑版的闪动。 */
+if (new URLSearchParams(location.search).get('embed') === '1') {
+  document.documentElement.classList.add('ag-embed');
+}
+</script>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================================================== 顶部：全站导航 + 模型状态 -->
+  <header class="topbar board-topbar">
+    <div class="title-block">
+      <span class="title-bar"></span>
+      <h1>星禾食品 BI 数据中心</h1>
+      <a class="nav-link" href="/">AI 经营驾驶舱</a>
+      <a class="nav-link" href="/dashboard.html">全国经营驾驶舱</a>
+      <a class="nav-link" href="/analysis.html">战区销售达成跟进</a>
+      <a class="nav-link" href="/pos.html">POS 分析</a>
+      <a class="nav-link" href="/sfa-visit.html">SFA 拜访分析</a>
+      <a class="nav-link" href="/sfa-profile.html">SFA 门店画像</a>
+      <a class="nav-link" href="/wholesale.html">批发经营分析</a>
+    </div>
+    <div class="filters board-filters">
+      <span class="ag-model" id="llm-chip" title="模型配置来自环境变量，前端拿不到 Key">模型：检测中…</span>
+      <button class="btn btn-reset" id="btn-clear" type="button">新会话</button>
+    </div>
+  </header>
+
+  <div class="subbar">
+    <span class="chip chip-year">AI 经营助手 · LangGraph Agent V3</span>
+    <span class="chip plain" title="TE 达成率、缺口、同比全部由 SQL 计算，模型只负责解释与建议">
+      数值由 SQL 算 · 模型只做解释
+    </span>
+    <span class="chips" id="scope-chips"></span>
+    <span class="subbar-right">
+      <span class="status" id="status">就绪</span>
+    </span>
+  </div>
+
+  <!-- 当前页面上下文：抽屉打开时由父页面注入；embed 模式也保留，回答范围可核对 -->
+  <div class="ag-ctxbar hidden" id="ctxbar">
+    <span class="ag-ctxbar-label">当前范围</span>
+    <span class="ag-ctxchip" id="ctx-chip"></span>
+    <span class="ag-ctxbar-hint">问题里明确说的条件优先于这里</span>
+  </div>
+
+  <!-- ===================================================== 主体：对话 + 过程面板 -->
+  <div class="ag-shell">
+
+    <section class="ag-main">
+      <div class="ag-thread" id="thread" aria-live="polite">
+        <article class="ag-msg ag-msg-bot ag-welcome">
+          <div class="ag-avatar">AI</div>
+          <div class="ag-bubble">
+            <h2>六类经营 Agent，一句话调用企业数据</h2>
+            <p>
+              Supervisor 会识别预算诊断、增长机会、价格、供应链短缺、采购预测和情景模拟，
+              再由 Planner、只读工具和 Checker 完成分析。所有计算数字必须来自现有 Mock 数据库或确定性公式。
+            </p>
+            <ul class="ag-cap">
+              <li><b>六类场景</b>：预算诊断、SKU 机会、价格竞争力、短缺风险、包材采购、需求模拟</li>
+              <li><b>会追问</b>：战区/年份越界（如战区F、2025）、问题与数据无关时，我不硬答</li>
+              <li><b>会说明</b>：MOCK 数据、月末库存快照、POS/SFA 覆盖和人工确认边界</li>
+            </ul>
+            <div class="ag-quick" id="quick"></div>
+            <section class="ag-kpi-panel" aria-label="Agent KPI 评估">
+              <div class="ag-kpi-head"><b>Agent KPI 评估</b>
+                <select id="kpi-scene" aria-label="按业务场景筛选KPI">
+                  <option value="">全部场景</option><option>DIAGNOSIS</option><option>OPPORTUNITY</option>
+                  <option>PRICE</option><option>SUPPLY_CHAIN</option><option>PROCUREMENT</option><option>SIMULATION</option>
+                </select></div>
+              <div id="kpi-grid" class="ag-kpi-grid"><span class="ag-kpi-empty">正在读取指标…</span></div>
+              <p class="ag-kpi-note">实测、离线评测、Mock验证和待采集指标分开显示；待采集不会按 0 计算。</p>
+            </section>
+          </div>
+        </article>
+      </div>
+
+      <form class="ag-input" id="ask-form" autocomplete="off">
+        <textarea id="question" rows="2" maxlength="500"
+                  placeholder="例如：分析战区B 2026 年 10 月的销售预算达成情况，找出未达成的客户，并分析可能原因。"></textarea>
+        <div class="ag-input-foot">
+          <span class="ag-tip">Enter 发送 · Shift+Enter 换行</span>
+          <button class="btn btn-primary" id="btn-send" type="submit">开始分析</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="ag-side" aria-label="分析过程">
+      <section class="card ag-sidecard">
+        <div class="card-head">本次理解<span class="card-tag" id="u-by">—</span></div>
+        <div class="ag-kv" id="understood">
+          <div class="ag-kv-empty">还没有提问</div>
+        </div>
+      </section>
+
+      <section class="card ag-sidecard">
+        <div class="card-head">分析过程<span class="card-tag" id="step-count">0</span></div>
+        <ol class="ag-steps" id="steps"></ol>
+      </section>
+
+      <section class="card ag-sidecard">
+        <div class="card-head">工具调用<span class="card-tag" id="tool-count">0</span></div>
+        <div class="ag-tools" id="tools"></div>
+      </section>
+
+      <section class="card ag-sidecard">
+        <div class="card-head">口径自校验<span class="card-tag" id="check-count">—</span></div>
+        <div class="ag-checks" id="checks"></div>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <span><b>数据</b> ERP · POS · SFA · 批发（SQLite 只读）· 供应链（MOCK_SUPPLY_CHAIN）</span>
+    <span><b>口径</b> TE 达成率 = 实际 ÷ 同期预算；POS 与 ERP 不相加</span>
+    <span><b>边界</b> 预算为 MOCK_BUDGET_TE；库存为月末快照；所有经营动作需人工确认</span>
+    <span><a class="foot-link" href="/portal.html">全部页面</a></span>
+  </footer>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<script type="module" src="/agent.js"></script>
+</body>
+</html>
